@@ -1,0 +1,3279 @@
+Directory structure:
+└── incomestreamsurfer-wordpress-claude-code-wizard/
+    ├── README.md
+    ├── apache-config.conf
+    ├── CLAUDE.md
+    ├── create_droplet_with_ssh.py
+    ├── docker-compose.yml
+    ├── Dockerfile
+    ├── fix_mcp.sh
+    ├── migrate_now.sh
+    ├── setup_ssh_and_deploy.sh
+    ├── wp-config.php
+    ├── .env.example
+    ├── .htaccess
+    ├── .mcp.json
+    ├── wp-content/
+    │   ├── plugins/
+    │   │   └── custom-post-types/
+    │   │       └── custom-post-types.php
+    │   └── themes/
+    │       └── my-custom-theme/
+    │           ├── footer.php
+    │           ├── functions.php
+    │           ├── header.php
+    │           ├── index.php
+    │           └── style.css
+    └── .claude/
+        ├── CLAUDE.md
+        └── wordpress_deployment_workflow.md
+
+
+Files Content:
+
+================================================
+FILE: README.md
+================================================
+# WordPress Claude Code Wizard 🚀
+
+Automated WordPress development and deployment pipeline for Digital Ocean. Develop locally with Docker, deploy to production with one command.
+
+## Features
+
+- **Identical Stack to DO**: Ubuntu 22.04, Apache 2.4.52, PHP 8.3, MySQL 8.0.42
+- **Custom Theme**: Ready-to-develop theme in `wp-content/themes/my-custom-theme/`
+- **Custom Post Types Plugin**: Portfolio and Testimonials CPTs
+- **One-Click Deployment**: Automated migration script to Digital Ocean
+- **Environment-Aware Config**: wp-config.php works on both local and production
+
+- Try SEO Grove: [SEO Grove](https://seogrove.ai/pre-registration)  
+- Join my Skool to say thanks: [My Skool](https://www.skool.com/iss-ai-automation-school-6342)
+
+
+## Quick Start
+
+### 1. Setup Environment
+```bash
+# Clone the repository
+git clone https://github.com/IncomeStreamSurfer/wordpress-claude-code-wizard.git
+cd wordpress-claude-code-wizard
+
+# Copy and configure .env
+cp .env.example .env
+# Edit .env and add your Digital Ocean API token
+```
+
+### 2. Local Development
+```bash
+# Start WordPress locally
+docker-compose up -d
+
+# Access at http://localhost
+# phpMyAdmin at http://localhost:8080
+```
+
+### 3. Deploy to Digital Ocean
+```bash
+# One-time SSH setup
+./setup_ssh_and_deploy.sh
+
+# Create droplet and deploy
+python3 create_droplet_with_ssh.py
+
+# Wait 5-10 minutes for installation
+# Then migrate your local WordPress
+./migrate_now.sh
+```
+
+## Development Workflow
+
+### Working on Your Custom Theme
+- Theme files: `wp-content/themes/my-custom-theme/`
+- Changes are reflected immediately (no restart needed)
+
+### Working on Custom Post Types
+- Plugin files: `wp-content/plugins/custom-post-types/`
+- After activation, you'll see Portfolio and Testimonials in the admin menu
+
+## Post-Deployment
+
+After deployment:
+1. Your site is live at `http://YOUR_DROPLET_IP`
+2. Point your domain's A record to the droplet IP
+3. Set up SSL: 
+   ```bash
+   ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP
+   certbot --apache
+   ```
+
+## File Structure
+```
+.
+├── docker-compose.yml              # Docker configuration
+├── Dockerfile                      # Custom Apache/PHP image
+├── wp-config.php                   # Environment-aware config
+├── .htaccess                       # Apache rules
+├── setup_ssh_and_deploy.sh         # SSH key setup
+├── create_droplet_with_ssh.py      # Droplet creation
+├── migrate_now.sh                  # Migration script
+├── wp-content/
+│   ├── themes/
+│   │   └── my-custom-theme/        # Your custom theme
+│   └── plugins/
+│       └── custom-post-types/      # CPT plugin
+└── .claude/                        # Claude's workflow memory
+```
+
+## Database Access
+
+**Local Development:**
+- Host: localhost:3306
+- Database: wordpress
+- User: wordpress
+- Password: wordpress_password
+
+**phpMyAdmin:** http://localhost:8080
+
+## Requirements
+
+- Docker & Docker Compose
+- Python 3 with pip
+- Digital Ocean account with API token
+- 10-15 minutes for complete deployment
+
+## Security Notes
+
+- Change all default passwords before production
+- Update `wp-config.php` salts (done automatically during deployment)
+- Enable firewall on Digital Ocean: `ufw allow 22,80,443/tcp && ufw enable`
+- Keep WordPress, themes, and plugins updated
+
+## How It Works
+
+1. **Docker** provides identical environment to production
+2. **SSH keys** are automatically configured for passwordless access
+3. **Cloud-init** installs WordPress on the droplet
+4. **Migration script** transfers your themes, plugins, and content
+5. **URL updates** are handled automatically
+
+From local development to live production in minutes!
+
+
+
+================================================
+FILE: apache-config.conf
+================================================
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+================================================
+FILE: CLAUDE.md
+================================================
+
+
+
+
+
+
+    # WordPress Claude Code Wizard - Complete Workflow & Development Guide
+
+     ## 🚨 MANDATORY: ONE-SHOT COMPLETE EXECUTION
+     
+     **YOU MUST COMPLETE THE ENTIRE WORKFLOW IN ONE SHOT. DO NOT STOP PARTWAY.**
+     **DO NOT deliver partial work. DO NOT stop after Phase 1. DO NOT skip steps.**
+     **COMPLETE MEANS: Research → Build Website → Test with Playwright → Fix ALL issues → DONE**
+     **The website must be FULLY FUNCTIONAL at http://localhost before you stop.**
+     
+     **DO NOT REPORT BACK TO THE USER OR ASK THEM ANYTHING UNTIL YOU HAVE:**
+     - A fully built website running at http://localhost
+     - All directory entries created and populated
+     - All taxonomy pages working
+     - Navigation menus fully populated
+     - ZERO 404 errors verified by Playwright
+     - Ready to run ./migrate_now.sh
+     
+     **The user hired you to BUILD A WEBSITE, not to show research or ask questions.**
+
+     ## ⚠️ CRITICAL REQUIREMENT: ZERO 404 ERRORS
+     
+     **EVERY website you build MUST have ZERO 404 errors. Use Playwright MCP to verify EVERY SINGLE link.**
+     **Headers and footers ALWAYS have broken links if you don't check them systematically.**
+     **Do not deliver a website until Playwright confirms every link works.**
+
+     ## 🎯 Main Workflow Process - COMPLETE ALL PHASES
+
+     When building a directory website, you MUST complete ALL phases in one continuous workflow:
+
+     ### Phase 1: Deep Research & Comprehensive Data Collection
+     
+     **GOAL: Create pages so information-rich that visitors never need to leave your site**
+     
+     1. **Research each individual entry exhaustively using Jina AI**
+        - Scrape the company's main website completely
+        - Find and scrape their pricing pages, feature lists, documentation
+        - Search for reviews, comparisons, alternatives
+        - Gather technical specifications, integrations, use cases
+        - Find case studies, success stories, testimonials
+        - Collect founder information, company history, funding details
+        - Get support options, contact methods, social media links
+        - Retry any failed scrapes until you have EVERYTHING
+     
+     2. **Build massive JSON datasets for each entry**
+        Each individual page JSON should contain:
+        ```json
+        {
+          "basics": {
+            "name", "tagline", "description" (500+ words),
+            "founded", "headquarters", "employees", "funding"
+          },
+          "detailed_features": [
+            {"name", "description" (100+ words), "category", "importance"}
+          ],
+          "pricing": {
+            "model", "free_tier", "starter_price", "tiers": [
+              {"name", "price", "features" (20+), "limits", "best_for"}
+            ]
+          },
+          "use_cases": [
+            {"title", "description" (200+ words), "industry", "company_size"}
+          ],
+          "pros_cons": {
+            "pros": [{"title", "explanation" (50+ words)}],
+            "cons": [{"title", "explanation" (50+ words)}]
+          },
+          "integrations": [
+            {"name", "type", "description", "documentation_url"}
+          ],
+          "alternatives": [
+            {"name", "comparison" (100+ words), "when_to_choose"}
+          ],
+          "reviews": {
+            "average_rating", "total_reviews",
+            "rating_breakdown": {"5": %, "4": %, "3": %, "2": %, "1": %},
+            "expert_reviews": [{"source", "rating", "summary" (200+ words)}]
+          },
+          "technical_specs": {
+            "platforms", "languages", "api", "security", "compliance"
+          },
+          "support": {
+            "channels", "response_time", "documentation_quality", "community"
+          },
+          "media": {
+            "logo", "screenshots" (10+), "videos", "diagrams"
+          }
+        }
+        ```
+     
+     3. **Create comprehensive taxonomy archive pages**
+        
+        **For Category/Type taxonomy pages (e.g., /categories/crm-software/, /types/italian-restaurants/, /specialties/anxiety-therapy/):**
+        - Comprehensive overview of the category (1000+ words)
+        - Complete buyer's/selection guide
+        - Key features to look for
+        - Common use cases and who needs this
+        - Price range analysis and what affects cost
+        - Industry trends and future outlook
+        - Comparison methodology explanation
+        - Top 10-20 entries with detailed previews
+        - Quick comparison table
+        - 20-30 FAQs about this category
+        - Related categories and how they differ
+        - Expert opinions and industry insights
+        - Glossary of category-specific terms
+        - Statistics and market data
+        - ALL entries in this category listed below with rich cards
+        
+        **For Location pages (e.g., /locations/new-york/):**
+        - Complete local market analysis (1000+ words)
+        - Local regulations and requirements
+        - Average prices in this area vs national
+        - Transportation and parking information
+        - Neighborhood-by-neighborhood breakdown
+        - Local insurance providers accepted
+        - Emergency services in the area
+        - Community resources and support groups
+        - Local statistics and demographics
+        - ALL providers in this location with detailed cards
+        - Nearby locations for comparison
+        - Local events and workshops
+        
+        **For Combined taxonomy pages (e.g., /crm-software-for-startups/, /italian-restaurants-manhattan/, /anxiety-therapists-new-york/):**
+        - Everything from both individual taxonomies combined
+        - Specific local/niche context 
+        - Why this combination matters (e.g., "Why startups need different CRM")
+        - Unique considerations for this intersection
+        - Price analysis for this specific combination
+        - Top 10 detailed comparisons with scoring methodology
+        - Map visualization (if location-based)
+        - Availability/wait times analysis
+        - Quick filter and sort options
+        - ALL matching entries with rich information cards
+     
+     4. **Collect extensive imagery**
+        - Product screenshots (10+ per entry)
+        - Logo variations
+        - Feature demonstration images
+        - Comparison charts and infographics
+        - Industry-relevant stock photos from Unsplash
+        - Create custom diagrams where needed
+
+     ### Phase 2: Website Development (THIS IS NOT OPTIONAL - YOU MUST BUILD THE WEBSITE)
+     
+     **DO NOT STOP AFTER RESEARCH. BUILD THE ACTUAL WEBSITE NOW.**
+     
+     1. **Start with local WordPress Docker environment**
+        - Run `docker-compose up -d`
+        - Access at http://localhost
+     
+     2. **Build the custom theme with FULL SEO optimization**
+        - Create detailed, complex CSS (not simple/short)
+        - Modern, clean, modular design
+        - Implement all directory pages from JSON data
+        - Add comprehensive animations and interactions
+        - Ensure responsive design with multiple breakpoints
+     
+     3. **Generate ALL ranking pages with maximized SEO**
+        - Create "Best X in Y" pages for every location/category combination - THIS IS ESSENTIAL ON LOCATION PAGES
+        - Maximize meta titles (60 chars) for each page - use words like Best X in Y or something else to help rank for those keywords
+        - Maximize meta descriptions (160 chars) for each page
+        - Create unique, comprehensive H1 titles
+        - Write detailed, SEO-optimized descriptions for every page
+        - Build internal linking structure between related pages
+     
+     4. **Create 5-7 horizontal template variations**
+        - Grid layout with filters
+        - Card-based design with hover effects  
+        - List view with detailed information
+        - Comparison table layout
+        - Map-based directory view
+        - Featured/spotlight layout
+        - Masonry/Pinterest style layout
+     
+     5. **Build mega header navigation**
+        - Multi-level dropdown menus
+        - Search functionality
+        - Category quick links
+        - Location selector
+        - Sticky header on scroll
+        - Mobile-optimized hamburger menu
+     
+     6. **Implement review system (not basic comments)**
+        - Custom review form for each directory entry
+        - Frame as "Leave a Review" for product/service
+        - Star rating system
+        - Review categories (quality, service, value, etc.)
+        - Review moderation queue
+        - Display average ratings
+        - Sort reviews by helpful/recent/rating
+     
+     7. **Add contact form**
+        - Professional contact form with validation
+        - Multiple contact reasons dropdown
+        - File upload capability
+        - Anti-spam measures
+        - Email notification system
+     
+     8. **Import directory data from JSON**
+        - Create custom post types for directory entries
+        - Import JSON data into WordPress
+        - Set up taxonomy/category structure
+        - Generate all location/category pages automatically
+     
+     9. **Test thoroughly locally**
+        - Check all pages and permalinks
+        - Verify images load correctly
+        - Test responsive design
+        - Validate all SEO elements
+        - Test review submission
+        - Test contact form
+
+     ### Phase 2.5: MANDATORY Playwright Verification - CHECK EVERY SINGLE LINK
+     
+     **⛔ STOP! DO NOT SKIP THIS! YOU MUST CHECK EVERY SINGLE LINK WITH PLAYWRIGHT!**
+     
+     **THE WEBSITE IS NOT COMPLETE UNTIL PLAYWRIGHT VERIFIES ZERO 404s**
+     
+     Use the pre-configured Playwright MCP to verify EVERY link works. Do not just check "a few" links.
+     Do not just check "some" pages. CHECK THEM ALL. The header and footer ALWAYS have broken links
+     if you don't verify them properly!
+     
+     1. **MANDATORY: Extract and Test EVERY Header Link**
+        ```
+        Use playwright mcp to:
+        1. Navigate to http://localhost
+        2. Extract ALL href attributes from the header navigation
+        3. Create a list of EVERY SINGLE link found
+        4. Visit EACH link one by one
+        5. Verify EACH loads without 404
+        6. If ANY link returns 404, FIX IT IMMEDIATELY
+        
+        Example: If header has Home, About, Services, Blog, Contact, Categories dropdown with 
+        10 categories, Location dropdown with 20 locations - that's 35 links to check. 
+        CHECK ALL 35. Not 5. Not 10. ALL 35.
+        ```
+     
+     2. **MANDATORY: Extract and Test EVERY Footer Link**
+        ```
+        Use playwright mcp to:
+        1. Scroll to footer
+        2. Extract ALL href attributes from the footer
+        3. Visit EVERY SINGLE footer link
+        4. Do not assume they work - TEST THEM
+        5. Common broken footer links: Privacy Policy, Terms, Sitemap
+        6. CREATE these pages if they don't exist
+        ```
+     
+     3. **MANDATORY: Test EVERY Directory Entry**
+        ```
+        DO NOT test "a few examples" - test EVERY SINGLE ONE:
+        - Get the full list of all directory entries
+        - Visit each one: /companies/company-1/, /companies/company-2/, etc.
+        - If you have 50 entries, test all 50
+        - Each must load with proper content, not 404
+        ```
+     
+     4. **MANDATORY: Test EVERY Taxonomy Page**
+        ```
+        Test EVERY SINGLE taxonomy page that should exist:
+        - EVERY category: /categories/[slug]/ for each category
+        - EVERY location: /locations/[slug]/ for each location  
+        - EVERY tag: /tags/[slug]/ for each tag
+        - EVERY combination page if they exist
+        - Do not test "some" - test EVERY SINGLE ONE
+        ```
+     
+     5. **MANDATORY: Systematic Link Extraction and Testing**
+        ```
+        Use playwright mcp to run this systematic check:
+        
+        // Extract ALL links from the site
+        const allLinks = await page.evaluate(() => {
+          return Array.from(document.querySelectorAll('a[href]'))
+            .map(a => a.href)
+            .filter(href => href.startsWith('http://localhost'));
+        });
+        
+        // Test EVERY SINGLE link
+        for (const link of allLinks) {
+          await page.goto(link);
+          // Check for 404 or error
+          // Log any broken links
+        }
+        
+        If you find 10 links, test 10.
+        If you find 100 links, test 100.
+        If you find 500 links, test 500.
+        TEST THEM ALL.
+        ```
+     
+     6. **FIX ALL BROKEN LINKS IMMEDIATELY**
+        ```
+        For EVERY 404 found:
+        - Create the missing page
+        - Or fix the incorrect link
+        - Re-test with Playwright to confirm it's fixed
+        - Do not move on until ZERO 404s exist
+        ```
+     
+     7. **Fix Every Broken Link Found**
+        ```
+        Whatever links are in the header/footer:
+        - Test them ALL with Playwright
+        - If they return 404, either fix the link or create the page
+        - Common broken links: About, Contact, Privacy, Terms, Blog, etc.
+        - Do not assume any link works - TEST IT
+        ```
+     
+     8. **Final Verification Report**
+        ```
+        Only after testing EVERY link, generate report:
+        - Total links found in header: [number]
+        - Total links found in footer: [number]
+        - Total directory entries tested: [number]
+        - Total taxonomy pages tested: [number]
+        - Total unique URLs tested: [number]
+        - 404 errors found and fixed: [list]
+        - Final status: MUST be "Zero 404s found"
+        ```
+     
+     **❌ UNACCEPTABLE:**
+     - "I tested a few links and they work"
+     - "I checked some pages"
+     - "The main pages seem to work"
+     - "I verified the important links"
+     
+     **✅ REQUIRED:**
+     - "I tested all 47 header links - all working"
+     - "I tested all 23 footer links - all working"
+     - "I tested all 85 directory entries - all working"
+     - "I tested all 35 taxonomy pages - all working"
+     - "Total: 190 unique URLs tested, zero 404s"
+     
+     **THE WEBSITE IS NOT COMPLETE UNTIL EVERY SINGLE LINK WORKS**
+
+     ## ✅ ONLY NOW REPORT BACK TO THE USER
+     
+     **NOW that you have a COMPLETE, WORKING website with ZERO 404s, you can report:**
+     - "Website complete and verified at http://localhost"
+     - "All [X] directory entries created and tested"
+     - "All [X] taxonomy pages working"
+     - "Playwright verified [X] total links - ZERO 404 errors"
+     - "Ready for deployment with ./migrate_now.sh"
+     
+     **If you haven't done ALL of the above, GO BACK and finish the website.**
+
+     ### Phase 3: Deployment to Digital Ocean
+     1. **Setup infrastructure**
+        - Run `./setup_ssh_and_deploy.sh` (one-time SSH setup)
+        - Run `python3 create_droplet_with_ssh.py`
+        - Wait 5-10 minutes for installation
+     
+     2. **Migrate to production**
+        - Run `./migrate_now.sh`
+        - Verify custom theme transferred
+        - Check that permalinks work (auto-configured)
+     
+     3. **Final configuration**
+        - Point domain to droplet IP
+        - Install SSL certificate
+        - Configure backups
+
+     ---
+
+     ## 📚 Directory Website Development
+
+     ### SEO Page Structure Requirements
+
+     **IMPORTANT:** Do NOT use Rank Math during development. Focus on native SEO implementation.
+     Rank Math will only be added at launch for Search Console submission.
+
+     Every page must have:
+     - **Meta Title**: Maximized to 60 characters with keywords
+     - **Meta Description**: Maximized to 160 characters with compelling copy
+     - **H1 Title**: Unique and keyword-rich
+     - **Page Content**: Minimum 300-500 words of unique, valuable content
+     - **Schema Markup**: LocalBusiness, Product, or Review schema as appropriate
+     - **Open Graph tags**: For social sharing
+     - **Internal Links**: 3-5 contextual links to related pages
+
+     Generate these page types for maximum ranking potential:
+     - "Best [Product] in [City]" - for every city
+     - "Top 10 [Category] in [State]" - for every state
+     - "[Product] near me" - location-based pages
+     - "[Category] Reviews [Year]" - fresh content pages
+     - "Compare [Product A] vs [Product B]" - comparison pages
+     - "[Product] for [Use Case]" - intent-based pages
+     - "Cheap/Affordable [Product] in [Location]" - price-focused pages
+
+     ### Review System Framework
+
+     Frame reviews contextually based on the directory type:
+     - For restaurants: "[Cuisine] lovers who dined at [Restaurant] can leave a review"
+     - For products: "[Product] users who tried [Brand] can share their experience"
+     - For services: "Customers who used [Service] from [Company] can rate their experience"
+     - For venues: "Visitors who went to [Venue] can share their thoughts"
+
+     Review form should include:
+     - Overall star rating (1-5 stars)
+     - Category-specific ratings (e.g., Quality, Service, Value, Location)
+     - Written review with minimum 50 characters
+     - Photo upload option
+     - "Would you recommend?" Yes/No
+     - Verified purchase/visit checkbox
+     - Helpful/Not Helpful voting on other reviews
+
+     ### Research Phase with Jina AI
+
+     When building directory websites, use Jina AI for comprehensive research:
+
+     ```bash
+     # Search for information (use s.jina.ai)
+     curl "https://s.jina.ai/?q=YOUR_SEARCH_TERM" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+
+     # Scrape individual pages (use r.jina.ai)
+     curl "https://r.jina.ai/https://example.com/page" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     ```
+
+     **Important Research Guidelines:**
+     - Create detailed JSON for each directory page
+     - If a page 404s or doesn't scrape properly, retry the scrape
+     - DO NOT use Jina to scrape CSS from design sites
+
+     ### Finding Royalty-Free Images
+
+     ```bash
+     # Search for Unsplash images using Jina
+     curl "https://s.jina.ai/?q=YOUR_IMAGE_DESCRIPTION+unsplash" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     
+     # Then scrape the found Unsplash pages for non-premium images
+     curl "https://r.jina.ai/https://unsplash.com/photos/..." \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     ```
+
+     ### Directory Page JSON Format
+
+     Each directory entry should have comprehensive data:
+
+     ```json
+     {
+       "id": "unique-identifier",
+       "name": "Company/Service Name",
+       "category": "Technology Category",
+       "description": "Detailed description...",
+       "features": ["feature1", "feature2", "..."],
+       "pricing": {
+         "model": "subscription/one-time/freemium",
+         "tiers": [...]
+       },
+       "images": {
+         "logo": "url-from-unsplash",
+         "screenshots": ["url1", "url2"],
+         "hero": "hero-image-url"
+       },
+       "metadata": {
+         "founded": "year",
+         "headquarters": "location",
+         "employees": "range",
+         "funding": "amount"
+       },
+       "links": {
+         "website": "url",
+         "documentation": "url",
+         "pricing": "url"
+       },
+       "tags": ["tag1", "tag2"],
+       "lastUpdated": "timestamp"
+     }
+     ```
+
+     ### CSS Development Guidelines
+
+     **IMPORTANT:** Create extremely detailed and complex CSS files that are well-thought-out:
+
+     - Don't write short, simple CSS - make it comprehensive
+     - Include detailed animations and transitions
+     - Add hover states, focus states, and active states
+     - Create responsive breakpoints for all screen sizes
+     - Include print styles and accessibility features
+     - Use CSS custom properties for theming
+     - Add detailed comments explaining complex sections
+     - Implement sophisticated grid and flexbox layouts
+     - Include fallbacks for older browsers
+
+     Example of detailed CSS approach:
+     ```css
+     /* Component: Directory Card
+        Purpose: Display individual directory entries
+        States: default, hover, active, disabled, loading
+        Breakpoints: mobile-first approach with 5 breakpoints
+        Accessibility: WCAG 2.1 AA compliant */
+     
+     .directory-card {
+       /* Base styles with extensive properties */
+       /* Multiple transition effects */
+       /* Complex shadow systems */
+       /* Detailed spacing scales */
+     }
+     ```
+
+     ## 🚀 Quick Deploy Workflow
+
+     When a user clones this repository and wants to deploy WordPress to Digital Ocean,
+     execute these commands in order:
+
+     ```bash
+     # 1. Setup environment
+     cp .env.example .env
+     # User must edit .env and add DO_API_TOKEN and JINA_API_KEY
+
+     # 2. Install Python dependencies
+     pip3 install python-dotenv requests
+
+     # 3. Start local WordPress
+     docker-compose up -d
+
+     # 4. Setup SSH keys (one-time)
+     ./setup_ssh_and_deploy.sh
+
+     # 5. Create Digital Ocean droplet
+     python3 create_droplet_with_ssh.py
+
+     # 6. Wait for installation (5-10 minutes)
+     sleep 300
+
+     # 7. Migrate local WordPress to droplet
+     ./migrate_now.sh
+     ```
+
+     ## 📁 Project Structure
+
+     ```
+     wordpress-claude-code-wizard/
+     ├── .env                          # DO_API_TOKEN goes here
+     ├── docker-compose.yml            # Local WordPress environment
+     ├── Dockerfile                    # Custom Apache/PHP image
+     ├── wp-config.php                # Environment-aware configuration
+     ├── setup_ssh_and_deploy.sh      # SSH key automation
+     ├── create_droplet_with_ssh.py   # Droplet creation script
+     ├── migrate_now.sh               # Migration script
+     └── wp-content/
+         ├── themes/
+         │   └── my-custom-theme/     # Starter theme
+         └── plugins/
+             └── custom-post-types/    # CPT plugin
+     ```
+
+     ## 🎨 WordPress Development Guide
+
+     ### Theme Development
+
+     Users can modify the custom theme in `wp-content/themes/my-custom-theme/`:
+
+     ```bash
+     # Create new page template
+     cat > wp-content/themes/my-custom-theme/page-about.php << 'EOF'
+     <?php
+     /* Template Name: About Page */
+     get_header();
+     ?>
+     <main class="site-main">
+         <div class="container">
+             <h1><?php the_title(); ?></h1>
+             <?php the_content(); ?>
+         </div>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+
+     # Create custom single post template
+     cat > wp-content/themes/my-custom-theme/single.php << 'EOF'
+     <?php get_header(); ?>
+     <main class="site-main">
+         <article>
+             <h1><?php the_title(); ?></h1>
+             <div class="meta">Posted on <?php echo get_the_date(); ?></div>
+             <?php the_content(); ?>
+         </article>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+
+     # Create archive template
+     cat > wp-content/themes/my-custom-theme/archive.php << 'EOF'
+     <?php get_header(); ?>
+     <main class="site-main">
+         <h1><?php the_archive_title(); ?></h1>
+         <?php while (have_posts()) : the_post(); ?>
+             <article>
+                 <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+                 <?php the_excerpt(); ?>
+             </article>
+         <?php endwhile; ?>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+     ```
+
+     ### Adding Navigation Menus
+
+     Add to `wp-content/themes/my-custom-theme/functions.php`:
+
+     ```php
+     // Register multiple menu locations
+     register_nav_menus(array(
+         'primary' => __('Primary Menu', 'my-custom-theme'),
+         'footer' => __('Footer Menu', 'my-custom-theme'),
+         'social' => __('Social Links Menu', 'my-custom-theme'),
+     ));
+
+     // Add menu support
+     add_theme_support('menus');
+     ```
+
+     Display menus in theme templates:
+
+     ```php
+     // In header.php
+     <?php wp_nav_menu(array('theme_location' => 'primary')); ?>
+
+     // In footer.php
+     <?php wp_nav_menu(array('theme_location' => 'footer')); ?>
+     ```
+
+     ### WP-CLI Commands (Inside Docker Container)
+
+     ```bash
+     # Access the WordPress container
+     docker exec -it wp-dev bash
+
+     # Install WP-CLI (if not already installed)
+     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+     chmod +x wp-cli.phar
+     mv wp-cli.phar /usr/local/bin/wp
+
+     # Create pages
+     wp post create --post_type=page --post_title='Home' --post_status=publish
+     wp post create --post_type=page --post_title='About Us' --post_status=publish
+     wp post create --post_type=page --post_title='Services' --post_status=publish
+     wp post create --post_type=page --post_title='Contact' --post_status=publish
+     wp post create --post_type=page --post_title='Blog' --post_status=publish
+
+     # Set static homepage
+     wp option update page_on_front 2  # Use page ID
+     wp option update show_on_front page
+     wp option update page_for_posts 5  # Blog page ID
+
+     # Create menu
+     wp menu create "Main Menu"
+     wp menu location assign main-menu primary
+     wp menu item add-post main-menu 2  # Add pages to menu
+     wp menu item add-post main-menu 3
+     wp menu item add-post main-menu 4
+
+     # Install popular plugins
+     wp plugin install contact-form-7 --activate
+     wp plugin install wordpress-seo --activate
+     wp plugin install elementor --activate
+     wp plugin install woocommerce --activate
+     wp plugin install updraftplus --activate
+
+     # Create users
+     wp user create john john@example.com --role=editor --user_pass=password123
+     wp user create jane jane@example.com --role=author --user_pass=password123
+
+     # Update site options
+     wp option update blogname "My Awesome Site"
+     wp option update blogdescription "A WordPress site built with Claude Code Wizard"
+     wp option update timezone_string "America/New_York"
+
+     # Set permalinks
+     wp rewrite structure '/%postname%/'
+     wp rewrite flush
+     ```
+
+     ### Custom Post Types
+
+     The included plugin already creates Portfolio and Testimonial post types. To add
+     more:
+
+     ```php
+     // Add to wp-content/plugins/custom-post-types/custom-post-types.php
+
+     public function register_team_post_type() {
+         $args = array(
+             'labels' => array(
+                 'name' => 'Team Members',
+                 'singular_name' => 'Team Member',
+             ),
+             'public' => true,
+             'has_archive' => true,
+             'supports' => array('title', 'editor', 'thumbnail'),
+             'menu_icon' => 'dashicons-groups',
+             'show_in_rest' => true,
+         );
+         register_post_type('team', $args);
+     }
+     // Add to __construct(): add_action('init', array($this,
+     'register_team_post_type'));
+     ```
+
+     ### Advanced Theme Features
+
+     ```php
+     // Add to functions.php
+
+     // Custom image sizes
+     add_theme_support('post-thumbnails');
+     add_image_size('hero', 1920, 600, true);
+     add_image_size('team-member', 400, 400, true);
+
+     // Widget areas
+     function my_widgets_init() {
+         register_sidebar(array(
+             'name' => 'Homepage Widgets',
+             'id' => 'homepage-widgets',
+             'before_widget' => '<div class="widget">',
+             'after_widget' => '</div>',
+         ));
+     }
+     add_action('widgets_init', 'my_widgets_init');
+
+     // Custom logo support
+     add_theme_support('custom-logo', array(
+         'height' => 100,
+         'width' => 400,
+         'flex-height' => true,
+         'flex-width' => true,
+     ));
+
+     // Gutenberg support
+     add_theme_support('align-wide');
+     add_theme_support('editor-styles');
+     add_theme_support('wp-block-styles');
+     ```
+
+     ## 🔧 Troubleshooting Commands
+
+     ```bash
+     # Check if Docker containers are running
+     docker ps | grep wp-
+
+     # View Docker logs
+     docker-compose logs wordpress
+
+     # Restart containers
+     docker-compose restart
+
+     # Access MySQL directly
+     docker exec -it wp-mysql mysql -u wordpress -pwordpress_password wordpress
+
+     # Check droplet status
+     cat .droplet_info | python3 -m json.tool
+
+     # SSH to droplet
+     ssh -i ~/.ssh/wordpress_deploy root@$(cat .droplet_info | python3 -c "import
+     json,sys; print(json.load(sys.stdin)['ip_address'])")
+
+     # View WordPress error logs on droplet
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP "tail -f /var/log/apache2/error.log"
+
+     # Check cloud-init status
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP "cloud-init status"
+
+     # Delete droplet (cleanup)
+     python3 -c "
+     import requests, json, os
+     api_token = os.getenv('DO_API_TOKEN')
+     with open('.droplet_info') as f:
+         droplet_id = json.load(f)['droplet_id']
+     headers = {'Authorization': f'Bearer {api_token}'}
+     response =
+     requests.delete(f'https://api.digitalocean.com/v2/droplets/{droplet_id}',
+     headers=headers)
+     print('Droplet deleted' if response.status_code == 204 else 'Failed')
+     "
+     ```
+
+     ### 🚨 Fixing 404 Errors on Pages
+
+     If you encounter 404 errors on pages after deployment, the scripts now handle this
+     automatically. However, if you still have issues:
+
+     ```bash
+     # SSH to droplet
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP
+
+     # Check if permalinks are set correctly
+     wp --allow-root rewrite structure
+     
+     # Manually set permalinks and flush
+     wp --allow-root rewrite structure '/%postname%/'
+     wp --allow-root rewrite flush
+
+     # Verify Apache configuration
+     cat /etc/apache2/sites-enabled/wordpress.conf
+     # Should show: AllowOverride All
+
+     # Check .htaccess exists and is correct
+     cat /var/www/html/.htaccess
+     
+     # Restart Apache
+     systemctl restart apache2
+     ```
+
+     **Note:** The deployment scripts now automatically:
+     - Install WP-CLI on the server
+     - Configure Apache with AllowOverride All
+     - Set permalinks to /%postname%/
+     - Create proper .htaccess file
+     - Flush rewrite rules after migration
+
+     ## 📊 Production Deployment Checklist
+
+     Before deploying to production:
+
+     1. ✅ Update passwords in wp-config.php
+     2. ✅ Set WP_DEBUG to false
+     3. ✅ Update salts (automatic during migration)
+     4. ✅ Install SSL certificate (certbot --apache)
+     5. ✅ Configure domain DNS
+     6. ✅ Enable firewall (ufw)
+     7. ✅ Set up backups
+     8. ✅ Configure email settings
+
+     ## 🎯 Complete Workflow Summary
+
+     1. **Clone repo** → Get complete WordPress development environment
+     2. **Docker up** → Local WordPress running instantly
+     3. **Develop** → Theme, plugins, content - everything
+     4. **Setup SSH** → One-time automated key configuration
+     5. **Create droplet** → Automated via API with WordPress installation
+     6. **Migrate** → Transfer everything to production
+     7. **Point domain** → Update DNS A record
+     8. **SSL** → Run certbot for HTTPS
+     9. **Live** → Production WordPress site running!
+
+     ## 💡 Key Features This Provides
+
+     - **Zero DevOps knowledge required** - Just need DO API token
+     - **Perfect environment parity** - Docker matches production exactly
+     - **Complete WordPress control** - Full admin access, all features
+     - **Real VPS** - Not shared hosting, full server control
+     - **One-command deployment** - Actually automated, not marketing speak
+     - **Cost effective** - $6/month for production site
+     - **No vendor lock-in** - Standard WordPress on standard Ubuntu
+     - **Version controlled** - Everything in Git
+     - **Instant local development** - Changes visible immediately
+     - **Professional workflow** - Local → Staging → Production capable
+
+     ## 🚨 Important Notes
+
+     - Always test locally before deploying
+     - Keep backups of production database
+     - Use strong passwords in production
+     - Update WordPress, themes, and plugins regularly
+     - Monitor server resources on Digital Ocean
+     - The migration script replaces the entire WordPress installation
+     - Custom plugins/themes in wp-content are preserved
+     - Database is completely replaced with local version
+
+     ## 🔄 Updating Production Site
+
+     To update your production site after local changes:
+
+     ```bash
+     # Make changes locally
+     # Test everything at http://localhost
+
+     # Re-run migration to update production
+     ./migrate_now.sh
+
+     # Your production site is now updated with all local changes
+     ```
+
+     This is a complete local-to-production WordPress development and deployment
+     pipeline that doesn't exist anywhere else in this form!
+
+
+================================================
+FILE: create_droplet_with_ssh.py
+================================================
+#!/usr/bin/env python3
+"""
+Create Digital Ocean Droplet with SSH access and WordPress
+"""
+
+import requests
+import json
+import time
+import sys
+import os
+from pathlib import Path
+
+# Load .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+def get_ssh_key_id():
+    """Get the SSH key ID from file or API"""
+    if os.path.exists('.ssh_key_id'):
+        with open('.ssh_key_id', 'r') as f:
+            return int(f.read().strip())
+    return None
+
+def create_wordpress_droplet():
+    api_token = os.getenv('DO_API_TOKEN')
+    if not api_token:
+        print("❌ DO_API_TOKEN not found")
+        sys.exit(1)
+    
+    headers = {
+        'Authorization': f'Bearer {api_token}',
+        'Content-Type': 'application/json'
+    }
+    
+    # Get SSH key ID
+    ssh_key_id = get_ssh_key_id()
+    if not ssh_key_id:
+        print("❌ No SSH key found. Run: ./setup_ssh_and_deploy.sh first")
+        sys.exit(1)
+    
+    # Generate passwords
+    import secrets
+    import string
+    chars = string.ascii_letters + string.digits
+    mysql_root_pass = ''.join(secrets.choice(chars) for _ in range(16))
+    wp_db_pass = ''.join(secrets.choice(chars) for _ in range(16))
+    
+    # Droplet configuration
+    name = f"wordpress-{int(time.time())}"
+    region = os.getenv('DROPLET_REGION', 'nyc3')
+    size = os.getenv('DROPLET_SIZE', 's-1vcpu-1gb')
+    
+    # User data script to install WordPress
+    user_data = f"""#!/bin/bash
+# Install WordPress on Ubuntu 22.04
+export DEBIAN_FRONTEND=noninteractive
+
+# Update system
+apt-get update && apt-get upgrade -y
+
+# Install Apache, PHP 8.3, MySQL
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:ondrej/php
+apt-get update
+
+# Install packages
+apt-get install -y apache2 mysql-server \\
+    php8.3 php8.3-cli php8.3-common php8.3-mysql \\
+    php8.3-xml php8.3-xmlrpc php8.3-curl php8.3-gd \\
+    php8.3-imagick php8.3-mbstring php8.3-zip \\
+    php8.3-intl php8.3-bz2 php8.3-bcmath php8.3-soap \\
+    libapache2-mod-php8.3
+
+# Configure MySQL
+mysql <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{mysql_root_pass}';
+CREATE DATABASE wordpress;
+CREATE USER 'wordpress'@'localhost' IDENTIFIED BY '{wp_db_pass}';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+
+# Download WordPress
+cd /tmp
+wget https://wordpress.org/wordpress-6.8.1.tar.gz
+tar xzvf wordpress-6.8.1.tar.gz
+cp -R wordpress/* /var/www/html/
+rm -f /var/www/html/index.html
+
+# Configure WordPress
+cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
+sed -i "s/database_name_here/wordpress/" /var/www/html/wp-config.php
+sed -i "s/username_here/wordpress/" /var/www/html/wp-config.php
+sed -i "s/password_here/{wp_db_pass}/" /var/www/html/wp-config.php
+
+# Set salts
+curl -s https://api.wordpress.org/secret-key/1.1/salt/ >> /tmp/salts
+sed -i "/AUTH_KEY/d; /SECURE_AUTH_KEY/d; /LOGGED_IN_KEY/d; /NONCE_KEY/d" /var/www/html/wp-config.php
+sed -i "/AUTH_SALT/d; /SECURE_AUTH_SALT/d; /LOGGED_IN_SALT/d; /NONCE_SALT/d" /var/www/html/wp-config.php
+sed -i "/define( 'DB_COLLATE'/r /tmp/salts" /var/www/html/wp-config.php
+
+# Set permissions
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {{}} \\;
+find /var/www/html -type f -exec chmod 644 {{}} \\;
+
+# Enable Apache modules
+a2enmod rewrite
+
+# Configure Apache virtual host with AllowOverride
+cat > /etc/apache2/sites-available/wordpress.conf <<'APACHECONF'
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+    
+    <Directory /var/www/html>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog ${{APACHE_LOG_DIR}}/error.log
+    CustomLog ${{APACHE_LOG_DIR}}/access.log combined
+</VirtualHost>
+APACHECONF
+
+# Enable the new site and disable default
+a2dissite 000-default.conf
+a2ensite wordpress.conf
+
+# Create .htaccess
+cat > /var/www/html/.htaccess <<'HTACCESS'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\\.php$ - [L]
+RewriteCond %{{REQUEST_FILENAME}} !-f
+RewriteCond %{{REQUEST_FILENAME}} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+HTACCESS
+
+chown www-data:www-data /var/www/html/.htaccess
+chmod 644 /var/www/html/.htaccess
+
+# Install WP-CLI
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
+
+# Restart Apache with new configuration
+systemctl restart apache2
+
+# Mark as ready
+touch /root/.wordpress_ready
+echo "MySQL Root: {mysql_root_pass}" > /root/credentials.txt
+echo "WP DB Pass: {wp_db_pass}" >> /root/credentials.txt
+"""
+    
+    # Create droplet
+    droplet_data = {
+        'name': name,
+        'region': region,
+        'size': size,
+        'image': 'ubuntu-22-04-x64',
+        'ssh_keys': [ssh_key_id],  # Use SSH key
+        'backups': False,
+        'ipv6': True,
+        'monitoring': True,
+        'tags': ['wordpress', 'automated'],
+        'user_data': user_data
+    }
+    
+    print(f"Creating droplet: {name}")
+    print(f"Region: {region}, Size: {size}")
+    print(f"Using SSH key ID: {ssh_key_id}")
+    
+    response = requests.post('https://api.digitalocean.com/v2/droplets', 
+                            headers=headers, json=droplet_data)
+    
+    if response.status_code != 202:
+        print(f"❌ Failed to create droplet: {response.text}")
+        sys.exit(1)
+    
+    droplet = response.json()['droplet']
+    droplet_id = droplet['id']
+    
+    print(f"✅ Droplet created with ID: {droplet_id}")
+    print("Waiting for droplet to become active...")
+    
+    # Wait for droplet to be active
+    for _ in range(60):
+        time.sleep(5)
+        response = requests.get(f'https://api.digitalocean.com/v2/droplets/{droplet_id}', 
+                              headers=headers)
+        if response.status_code == 200:
+            droplet = response.json()['droplet']
+            if droplet['status'] == 'active':
+                break
+    
+    # Get IP address
+    ip_address = None
+    for network in droplet['networks']['v4']:
+        if network['type'] == 'public':
+            ip_address = network['ip_address']
+            break
+    
+    # Save droplet info
+    droplet_info = {
+        'droplet_id': droplet_id,
+        'droplet_name': name,
+        'ip_address': ip_address,
+        'mysql_root_pass': mysql_root_pass,
+        'wp_db_pass': wp_db_pass,
+        'region': region,
+        'size': size,
+        'ssh_access': True
+    }
+    
+    with open('.droplet_info', 'w') as f:
+        json.dump(droplet_info, f, indent=2)
+    
+    print("\n================================================")
+    print("✅ WordPress Droplet Created with SSH Access!")
+    print("================================================")
+    print(f"IP Address: {ip_address}")
+    print(f"SSH Access: ssh -i ~/.ssh/wordpress_deploy root@{ip_address}")
+    print(f"\nMySQL Root Pass: {mysql_root_pass}")
+    print(f"WordPress DB Pass: {wp_db_pass}")
+    print("\nWordPress will be ready in 2-3 minutes")
+    print("\nNext: Run ./migrate_to_droplet.sh to migrate your local WordPress")
+
+if __name__ == '__main__':
+    create_wordpress_droplet()
+
+
+================================================
+FILE: docker-compose.yml
+================================================
+version: '3.8'
+
+services:
+  wordpress:
+    build: .
+    container_name: wp-dev
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress_password
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+      - ./wp-config.php:/var/www/html/wp-config.php
+      - ./.htaccess:/var/www/html/.htaccess
+    depends_on:
+      - mysql
+    networks:
+      - wordpress-network
+
+  mysql:
+    image: mysql:8.0.42
+    container_name: wp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    networks:
+      - wordpress-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: wp-phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - wordpress-network
+
+volumes:
+  mysql_data:
+
+networks:
+  wordpress-network:
+    driver: bridge
+
+
+================================================
+FILE: Dockerfile
+================================================
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Apache, PHP 8.3, and extensions matching DO stack
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    curl \
+    wget \
+    && add-apt-repository ppa:ondrej/php \
+    && apt-get update && apt-get install -y \
+    apache2 \
+    php8.3 \
+    php8.3-cli \
+    php8.3-common \
+    php8.3-mysql \
+    php8.3-xml \
+    php8.3-xmlrpc \
+    php8.3-curl \
+    php8.3-gd \
+    php8.3-imagick \
+    php8.3-mbstring \
+    php8.3-zip \
+    php8.3-intl \
+    php8.3-bz2 \
+    php8.3-bcmath \
+    php8.3-soap \
+    libapache2-mod-php8.3 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Enable Apache modules
+RUN a2enmod rewrite headers expires deflate ssl
+
+# Configure PHP settings to match DO
+RUN echo "upload_max_filesize = 64M" >> /etc/php/8.3/apache2/php.ini && \
+    echo "post_max_size = 64M" >> /etc/php/8.3/apache2/php.ini && \
+    echo "max_execution_time = 300" >> /etc/php/8.3/apache2/php.ini && \
+    echo "max_input_time = 300" >> /etc/php/8.3/apache2/php.ini && \
+    echo "memory_limit = 256M" >> /etc/php/8.3/apache2/php.ini
+
+# Download and install WordPress
+RUN cd /tmp && \
+    wget https://wordpress.org/wordpress-6.8.1.tar.gz && \
+    tar xzvf wordpress-6.8.1.tar.gz && \
+    cp -R wordpress/* /var/www/html/ && \
+    rm -rf /var/www/html/index.html && \
+    rm -rf /tmp/wordpress*
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    find /var/www/html -type d -exec chmod 755 {} \; && \
+    find /var/www/html -type f -exec chmod 644 {} \;
+
+# Apache configuration
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80
+
+CMD ["apache2ctl", "-D", "FOREGROUND"]
+
+
+================================================
+FILE: fix_mcp.sh
+================================================
+#!/bin/bash
+
+# Create .mcp.json file for Playwright MCP configuration
+cat > .mcp.json << 'EOF'
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
+    }
+  }
+}
+EOF
+
+echo "✅ Created .mcp.json with Playwright MCP configuration"
+echo "When you run 'claude' in this directory, you'll be prompted to approve the Playwright MCP."
+
+
+================================================
+FILE: migrate_now.sh
+================================================
+#!/bin/bash
+
+# Direct WordPress Migration Script
+set -e
+
+echo "================================================"
+echo "Migrating WordPress to Digital Ocean"
+echo "================================================"
+
+# Read droplet info
+DROPLET_IP=$(python3 -c "import json; print(json.load(open('.droplet_info'))['ip_address'])")
+MYSQL_ROOT_PASS=$(python3 -c "import json; print(json.load(open('.droplet_info'))['mysql_root_pass'])")
+WP_DB_PASS=$(python3 -c "import json; print(json.load(open('.droplet_info'))['wp_db_pass'])")
+SSH_KEY="$HOME/.ssh/wordpress_deploy"
+
+echo "Migrating to: $DROPLET_IP"
+
+# 1. Export local database
+echo "1. Exporting local database..."
+docker exec wp-mysql mysqldump -u wordpress -pwordpress_password wordpress > wordpress_backup.sql
+
+# 2. Update URLs in database
+echo "2. Updating URLs..."
+sed -i.bak "s|http://localhost|http://$DROPLET_IP|g" wordpress_backup.sql
+
+# 3. Package wp-content
+echo "3. Packaging wp-content..."
+tar -czf wp-content.tar.gz wp-content/
+
+# 4. Transfer files
+echo "4. Transferring files..."
+scp -i $SSH_KEY -o StrictHostKeyChecking=no wp-content.tar.gz root@$DROPLET_IP:/tmp/
+scp -i $SSH_KEY -o StrictHostKeyChecking=no wordpress_backup.sql root@$DROPLET_IP:/tmp/
+
+# 5. Install on droplet
+echo "5. Installing on droplet..."
+ssh -i $SSH_KEY -o StrictHostKeyChecking=no root@$DROPLET_IP << ENDSSH
+# Backup existing
+cd /var/www/html
+if [ -d "wp-content" ]; then
+    mv wp-content wp-content.orig
+fi
+
+# Extract our wp-content
+tar -xzf /tmp/wp-content.tar.gz
+
+# Import database
+mysql -u root -p$MYSQL_ROOT_PASS wordpress < /tmp/wordpress_backup.sql
+
+# Update database URLs
+mysql -u root -p$MYSQL_ROOT_PASS wordpress << EOSQL
+UPDATE wp_options SET option_value = 'http://$DROPLET_IP' WHERE option_name = 'siteurl';
+UPDATE wp_options SET option_value = 'http://$DROPLET_IP' WHERE option_name = 'home';
+UPDATE wp_posts SET guid = REPLACE(guid, 'http://localhost', 'http://$DROPLET_IP');
+UPDATE wp_posts SET post_content = REPLACE(post_content, 'http://localhost', 'http://$DROPLET_IP');
+UPDATE wp_postmeta SET meta_value = REPLACE(meta_value, 'http://localhost', 'http://$DROPLET_IP');
+EOSQL
+
+# Set permissions
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
+
+# Set permalinks and flush rewrite rules
+cd /var/www/html
+wp --allow-root rewrite structure '/%postname%/'
+wp --allow-root rewrite flush
+
+# Ensure .htaccess is writable and has correct rules
+chmod 664 /var/www/html/.htaccess
+cat > /var/www/html/.htaccess <<'HTACCESS'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+HTACCESS
+chown www-data:www-data /var/www/html/.htaccess
+
+# Restart Apache
+systemctl restart apache2
+
+echo "Migration complete!"
+ENDSSH
+
+# Clean up
+rm -f wp-content.tar.gz wordpress_backup.sql wordpress_backup.sql.bak
+
+echo "================================================"
+echo "✅ Migration Complete!"
+echo "================================================"
+echo "Your site with custom theme is now at: http://$DROPLET_IP"
+
+
+================================================
+FILE: setup_ssh_and_deploy.sh
+================================================
+#!/bin/bash
+
+# Setup SSH keys and deploy WordPress to Digital Ocean
+set -e
+
+echo "================================================"
+echo "WordPress Automated Deployment Setup"
+echo "================================================"
+
+# Generate SSH key if it doesn't exist
+SSH_KEY_PATH="$HOME/.ssh/wordpress_deploy"
+if [ ! -f "$SSH_KEY_PATH" ]; then
+    echo "Generating SSH key..."
+    ssh-keygen -t ed25519 -f "$SSH_KEY_PATH" -N "" -C "wordpress-deploy"
+    echo "✅ SSH key generated at $SSH_KEY_PATH"
+fi
+
+# Read the public key
+PUBLIC_KEY=$(cat "$SSH_KEY_PATH.pub")
+
+# Add SSH key to Digital Ocean via API
+echo "Adding SSH key to Digital Ocean..."
+python3 << EOF
+import requests
+import json
+import os
+
+# Load API token
+api_token = os.getenv('DO_API_TOKEN')
+if not api_token:
+    with open('.env', 'r') as f:
+        for line in f:
+            if line.startswith('DO_API_TOKEN='):
+                api_token = line.split('=')[1].strip()
+                break
+
+headers = {
+    'Authorization': f'Bearer {api_token}',
+    'Content-Type': 'application/json'
+}
+
+# Check if key already exists
+response = requests.get('https://api.digitalocean.com/v2/account/keys', headers=headers)
+ssh_keys = response.json().get('ssh_keys', [])
+
+public_key = """$PUBLIC_KEY"""
+key_name = "wordpress-deploy-key"
+
+# Find existing key
+key_id = None
+for key in ssh_keys:
+    if key['name'] == key_name:
+        key_id = key['id']
+        print(f"SSH key already exists with ID: {key_id}")
+        break
+
+# Add key if it doesn't exist
+if not key_id:
+    data = {
+        'name': key_name,
+        'public_key': public_key
+    }
+    response = requests.post('https://api.digitalocean.com/v2/account/keys', headers=headers, json=data)
+    if response.status_code == 201:
+        key_id = response.json()['ssh_key']['id']
+        print(f"✅ SSH key added with ID: {key_id}")
+    else:
+        print(f"❌ Failed to add SSH key: {response.text}")
+        exit(1)
+
+# Save key ID
+with open('.ssh_key_id', 'w') as f:
+    f.write(str(key_id))
+EOF
+
+echo ""
+echo "================================================"
+echo "SSH Setup Complete!"
+echo "================================================"
+echo ""
+echo "Now you can create droplets with SSH access:"
+echo "1. Run: python3 create_droplet_with_ssh.py"
+echo "2. The droplet will have your SSH key pre-installed"
+echo "3. Migration will work automatically"
+echo ""
+echo "SSH Key: $SSH_KEY_PATH"
+
+
+================================================
+FILE: wp-config.php
+================================================
+<?php
+/**
+ * WordPress Configuration - Works for both local Docker and Digital Ocean
+ */
+
+// Environment detection
+$is_local = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1'));
+
+// Database settings - dynamically set based on environment
+if ($is_local || getenv('WORDPRESS_DB_HOST')) {
+    // Docker/Local environment
+    define('DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'wordpress');
+    define('DB_USER', getenv('WORDPRESS_DB_USER') ?: 'wordpress');
+    define('DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: 'wordpress_password');
+    define('DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'mysql:3306');
+} else {
+    // Digital Ocean production - these will be set during deployment
+    define('DB_NAME', 'wordpress');
+    define('DB_USER', 'wordpress');
+    define('DB_PASSWORD', 'CHANGE_ON_DEPLOYMENT'); // Will be updated by deploy script
+    define('DB_HOST', 'localhost');
+}
+
+define('DB_CHARSET', 'utf8mb4');
+define('DB_COLLATE', '');
+
+// Authentication keys and salts
+define('AUTH_KEY',         'put your unique phrase here');
+define('SECURE_AUTH_KEY',  'put your unique phrase here');
+define('LOGGED_IN_KEY',    'put your unique phrase here');
+define('NONCE_KEY',        'put your unique phrase here');
+define('AUTH_SALT',        'put your unique phrase here');
+define('SECURE_AUTH_SALT', 'put your unique phrase here');
+define('LOGGED_IN_SALT',   'put your unique phrase here');
+define('NONCE_SALT',       'put your unique phrase here');
+
+// WordPress Database Table prefix
+$table_prefix = 'wp_';
+
+// Development/Debug settings
+if ($is_local) {
+    define('WP_DEBUG', true);
+    define('WP_DEBUG_LOG', true);
+    define('WP_DEBUG_DISPLAY', true);
+    define('SCRIPT_DEBUG', true);
+} else {
+    define('WP_DEBUG', false);
+    define('WP_DEBUG_DISPLAY', false);
+}
+
+// URL settings for development
+if ($is_local) {
+    define('WP_HOME', 'http://localhost');
+    define('WP_SITEURL', 'http://localhost');
+}
+
+// File permissions
+define('FS_METHOD', 'direct');
+define('FS_CHMOD_DIR', (0755 & ~ umask()));
+define('FS_CHMOD_FILE', (0644 & ~ umask()));
+
+// Increase memory limit
+define('WP_MEMORY_LIMIT', '256M');
+define('WP_MAX_MEMORY_LIMIT', '512M');
+
+// Disable automatic updates in development
+if ($is_local) {
+    define('AUTOMATIC_UPDATER_DISABLED', true);
+    define('WP_AUTO_UPDATE_CORE', false);
+}
+
+// SSL settings for production
+if (!$is_local && isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// Absolute path to the WordPress directory
+if (!defined('ABSPATH')) {
+    define('ABSPATH', dirname(__FILE__) . '/');
+}
+
+// Sets up WordPress vars and included files
+require_once(ABSPATH . 'wp-settings.php');
+
+
+================================================
+FILE: .env.example
+================================================
+# Digital Ocean API Configuration
+DO_API_TOKEN=your_digital_ocean_api_token_here
+
+# Jina AI API Key for research and scraping
+JINA_API_KEY=your_jina_api_key_here
+
+# MySQL Passwords (optional - will be generated if not provided)
+MYSQL_ROOT_PASSWORD=
+WP_DB_PASSWORD=
+
+# Droplet Configuration (optional)
+DROPLET_REGION=nyc3
+DROPLET_SIZE=s-1vcpu-1gb
+
+
+================================================
+FILE: .htaccess
+================================================
+# BEGIN WordPress
+# The directives (lines) between "BEGIN WordPress" and "END WordPress" are
+# dynamically generated, and should only be modified via WordPress filters.
+# Any changes to the directives between these markers will be overwritten.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Protect wp-config.php
+<Files wp-config.php>
+    order allow,deny
+    deny from all
+</Files>
+
+# Disable directory browsing
+Options -Indexes
+
+# Protect .htaccess
+<Files .htaccess>
+    order allow,deny
+    deny from all
+</Files>
+
+
+================================================
+FILE: .mcp.json
+================================================
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
+    }
+  }
+}
+
+
+================================================
+FILE: wp-content/plugins/custom-post-types/custom-post-types.php
+================================================
+<?php
+/**
+ * Plugin Name: Custom Post Types
+ * Plugin URI: https://example.com/
+ * Description: Adds custom post types to WordPress
+ * Version: 1.0.0
+ * Author: Your Name
+ * License: GPL v2 or later
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class CustomPostTypes {
+    
+    public function __construct() {
+        add_action('init', array($this, 'register_portfolio_post_type'));
+        add_action('init', array($this, 'register_portfolio_taxonomies'));
+        add_action('init', array($this, 'register_testimonial_post_type'));
+    }
+    
+    public function register_portfolio_post_type() {
+        $labels = array(
+            'name'                  => _x('Portfolio', 'Post type general name', 'custom-post-types'),
+            'singular_name'         => _x('Portfolio Item', 'Post type singular name', 'custom-post-types'),
+            'menu_name'             => _x('Portfolio', 'Admin Menu text', 'custom-post-types'),
+            'add_new'               => __('Add New', 'custom-post-types'),
+            'add_new_item'          => __('Add New Portfolio Item', 'custom-post-types'),
+            'edit_item'             => __('Edit Portfolio Item', 'custom-post-types'),
+            'new_item'              => __('New Portfolio Item', 'custom-post-types'),
+            'view_item'             => __('View Portfolio Item', 'custom-post-types'),
+            'view_items'            => __('View Portfolio', 'custom-post-types'),
+            'search_items'          => __('Search Portfolio', 'custom-post-types'),
+            'not_found'             => __('No portfolio items found', 'custom-post-types'),
+            'not_found_in_trash'    => __('No portfolio items found in Trash', 'custom-post-types'),
+        );
+        
+        $args = array(
+            'labels'             => $labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => array('slug' => 'portfolio'),
+            'capability_type'    => 'post',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => 5,
+            'menu_icon'          => 'dashicons-portfolio',
+            'supports'           => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+            'show_in_rest'       => true,
+        );
+        
+        register_post_type('portfolio', $args);
+    }
+    
+    public function register_portfolio_taxonomies() {
+        // Portfolio Categories
+        $labels = array(
+            'name'              => _x('Portfolio Categories', 'taxonomy general name', 'custom-post-types'),
+            'singular_name'     => _x('Portfolio Category', 'taxonomy singular name', 'custom-post-types'),
+            'search_items'      => __('Search Categories', 'custom-post-types'),
+            'all_items'         => __('All Categories', 'custom-post-types'),
+            'edit_item'         => __('Edit Category', 'custom-post-types'),
+            'update_item'       => __('Update Category', 'custom-post-types'),
+            'add_new_item'      => __('Add New Category', 'custom-post-types'),
+            'new_item_name'     => __('New Category Name', 'custom-post-types'),
+            'menu_name'         => __('Categories', 'custom-post-types'),
+        );
+        
+        $args = array(
+            'hierarchical'      => true,
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array('slug' => 'portfolio-category'),
+            'show_in_rest'      => true,
+        );
+        
+        register_taxonomy('portfolio_category', array('portfolio'), $args);
+        
+        // Portfolio Tags
+        $labels = array(
+            'name'              => _x('Portfolio Tags', 'taxonomy general name', 'custom-post-types'),
+            'singular_name'     => _x('Portfolio Tag', 'taxonomy singular name', 'custom-post-types'),
+            'search_items'      => __('Search Tags', 'custom-post-types'),
+            'all_items'         => __('All Tags', 'custom-post-types'),
+            'edit_item'         => __('Edit Tag', 'custom-post-types'),
+            'update_item'       => __('Update Tag', 'custom-post-types'),
+            'add_new_item'      => __('Add New Tag', 'custom-post-types'),
+            'new_item_name'     => __('New Tag Name', 'custom-post-types'),
+            'menu_name'         => __('Tags', 'custom-post-types'),
+        );
+        
+        $args = array(
+            'hierarchical'      => false,
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array('slug' => 'portfolio-tag'),
+            'show_in_rest'      => true,
+        );
+        
+        register_taxonomy('portfolio_tag', array('portfolio'), $args);
+    }
+    
+    public function register_testimonial_post_type() {
+        $labels = array(
+            'name'                  => _x('Testimonials', 'Post type general name', 'custom-post-types'),
+            'singular_name'         => _x('Testimonial', 'Post type singular name', 'custom-post-types'),
+            'menu_name'             => _x('Testimonials', 'Admin Menu text', 'custom-post-types'),
+            'add_new'               => __('Add New', 'custom-post-types'),
+            'add_new_item'          => __('Add New Testimonial', 'custom-post-types'),
+            'edit_item'             => __('Edit Testimonial', 'custom-post-types'),
+            'new_item'              => __('New Testimonial', 'custom-post-types'),
+            'view_item'             => __('View Testimonial', 'custom-post-types'),
+            'view_items'            => __('View Testimonials', 'custom-post-types'),
+            'search_items'          => __('Search Testimonials', 'custom-post-types'),
+            'not_found'             => __('No testimonials found', 'custom-post-types'),
+            'not_found_in_trash'    => __('No testimonials found in Trash', 'custom-post-types'),
+        );
+        
+        $args = array(
+            'labels'             => $labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+            'rewrite'            => array('slug' => 'testimonials'),
+            'capability_type'    => 'post',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => 6,
+            'menu_icon'          => 'dashicons-format-quote',
+            'supports'           => array('title', 'editor', 'thumbnail', 'custom-fields'),
+            'show_in_rest'       => true,
+        );
+        
+        register_post_type('testimonial', $args);
+    }
+}
+
+// Initialize the plugin
+new CustomPostTypes();
+
+// Flush rewrite rules on activation
+register_activation_hook(__FILE__, function() {
+    $cpt = new CustomPostTypes();
+    $cpt->register_portfolio_post_type();
+    $cpt->register_portfolio_taxonomies();
+    $cpt->register_testimonial_post_type();
+    flush_rewrite_rules();
+});
+
+// Flush rewrite rules on deactivation
+register_deactivation_hook(__FILE__, function() {
+    flush_rewrite_rules();
+});
+
+
+================================================
+FILE: wp-content/themes/my-custom-theme/footer.php
+================================================
+<footer class="site-footer">
+    <div class="container">
+        <p>&copy; <?php echo date('Y'); ?> <?php bloginfo('name'); ?>. All rights reserved.</p>
+        <?php if (has_nav_menu('footer')) : ?>
+            <nav class="footer-navigation">
+                <?php wp_nav_menu(array(
+                    'theme_location' => 'footer',
+                    'menu_class' => 'footer-menu',
+                )); ?>
+            </nav>
+        <?php endif; ?>
+    </div>
+</footer>
+
+<?php wp_footer(); ?>
+</body>
+</html>
+
+
+================================================
+FILE: wp-content/themes/my-custom-theme/functions.php
+================================================
+<?php
+/**
+ * Theme Functions
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+function my_custom_theme_setup() {
+    add_theme_support('title-tag');
+    add_theme_support('post-thumbnails');
+    add_theme_support('html5', array('search-form', 'comment-form', 'comment-list', 'gallery', 'caption'));
+    add_theme_support('custom-logo');
+    
+    register_nav_menus(array(
+        'primary' => __('Primary Menu', 'my-custom-theme'),
+        'footer' => __('Footer Menu', 'my-custom-theme'),
+    ));
+}
+add_action('after_setup_theme', 'my_custom_theme_setup');
+
+function my_custom_theme_scripts() {
+    wp_enqueue_style('my-custom-theme-style', get_stylesheet_uri(), array(), '1.0.0');
+    
+    if (is_singular() && comments_open() && get_option('thread_comments')) {
+        wp_enqueue_script('comment-reply');
+    }
+}
+add_action('wp_enqueue_scripts', 'my_custom_theme_scripts');
+
+function my_custom_theme_widgets_init() {
+    register_sidebar(array(
+        'name'          => __('Sidebar', 'my-custom-theme'),
+        'id'            => 'sidebar-1',
+        'description'   => __('Add widgets here.', 'my-custom-theme'),
+        'before_widget' => '<section id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ));
+}
+add_action('widgets_init', 'my_custom_theme_widgets_init');
+
+
+================================================
+FILE: wp-content/themes/my-custom-theme/header.php
+================================================
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php wp_head(); ?>
+</head>
+<body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
+
+<header class="site-header">
+    <div class="container">
+        <h1 class="site-title">
+            <a href="<?php echo esc_url(home_url('/')); ?>">
+                <?php bloginfo('name'); ?>
+            </a>
+        </h1>
+        <p class="site-description"><?php bloginfo('description'); ?></p>
+        
+        <?php if (has_nav_menu('primary')) : ?>
+            <nav class="main-navigation">
+                <?php wp_nav_menu(array(
+                    'theme_location' => 'primary',
+                    'menu_class' => 'primary-menu',
+                )); ?>
+            </nav>
+        <?php endif; ?>
+    </div>
+</header>
+
+
+================================================
+FILE: wp-content/themes/my-custom-theme/index.php
+================================================
+<?php get_header(); ?>
+
+<main class="site-main">
+    <div class="container">
+        <?php if (have_posts()) : ?>
+            <?php while (have_posts()) : the_post(); ?>
+                <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                    <h2 class="entry-title">
+                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                    </h2>
+                    <div class="entry-content">
+                        <?php the_excerpt(); ?>
+                    </div>
+                </article>
+            <?php endwhile; ?>
+            <?php the_posts_navigation(); ?>
+        <?php else : ?>
+            <p><?php esc_html_e('No posts found.', 'my-custom-theme'); ?></p>
+        <?php endif; ?>
+    </div>
+</main>
+
+<?php get_footer(); ?>
+
+
+================================================
+FILE: wp-content/themes/my-custom-theme/style.css
+================================================
+/*
+Theme Name: My Custom Theme
+Theme URI: https://example.com/
+Author: Your Name
+Author URI: https://example.com/
+Description: Custom WordPress theme for Digital Ocean deployment
+Version: 1.0.0
+License: GPL v2 or later
+Text Domain: my-custom-theme
+*/
+
+:root {
+    --primary-color: #0073aa;
+    --secondary-color: #005a87;
+    --text-color: #333;
+    --light-gray: #f5f5f5;
+    --border-color: #e0e0e0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.site-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 20px 0;
+}
+
+.site-main {
+    padding: 40px 0;
+    min-height: 500px;
+}
+
+.entry-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.entry-content {
+    line-height: 1.8;
+}
+
+.site-footer {
+    background: var(--text-color);
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+}
+
+
+================================================
+FILE: .claude/CLAUDE.md
+================================================
+
+
+
+
+
+
+    # WordPress Claude Code Wizard - Complete Workflow & Development Guide
+
+     ## 🚨 MANDATORY: ONE-SHOT COMPLETE EXECUTION
+     
+     **YOU MUST COMPLETE THE ENTIRE WORKFLOW IN ONE SHOT. DO NOT STOP PARTWAY.**
+     **DO NOT deliver partial work. DO NOT stop after Phase 1. DO NOT skip steps.**
+     **COMPLETE MEANS: Research → Build Website → Test with Playwright → Fix ALL issues → DONE**
+     **The website must be FULLY FUNCTIONAL at http://localhost before you stop.**
+     
+     **DO NOT REPORT BACK TO THE USER OR ASK THEM ANYTHING UNTIL YOU HAVE:**
+     - A fully built website running at http://localhost
+     - All directory entries created and populated
+     - All taxonomy pages working
+     - Navigation menus fully populated
+     - ZERO 404 errors verified by Playwright
+     - Ready to run ./migrate_now.sh
+     
+     **The user hired you to BUILD A WEBSITE, not to show research or ask questions.**
+
+     ## ⚠️ CRITICAL REQUIREMENT: ZERO 404 ERRORS
+     
+     **EVERY website you build MUST have ZERO 404 errors. Use Playwright MCP to verify EVERY SINGLE link.**
+     **Headers and footers ALWAYS have broken links if you don't check them systematically.**
+     **Do not deliver a website until Playwright confirms every link works.**
+
+     ## 🎯 Main Workflow Process - COMPLETE ALL PHASES
+
+     When building a directory website, you MUST complete ALL phases in one continuous workflow:
+
+     ### Phase 1: Deep Research & Comprehensive Data Collection
+     
+     **GOAL: Create pages so information-rich that visitors never need to leave your site**
+     
+     1. **Research each individual entry exhaustively using Jina AI**
+        - Scrape the company's main website completely
+        - Find and scrape their pricing pages, feature lists, documentation
+        - Search for reviews, comparisons, alternatives
+        - Gather technical specifications, integrations, use cases
+        - Find case studies, success stories, testimonials
+        - Collect founder information, company history, funding details
+        - Get support options, contact methods, social media links
+        - Retry any failed scrapes until you have EVERYTHING
+     
+     2. **Build massive JSON datasets for each entry**
+        Each individual page JSON should contain:
+        ```json
+        {
+          "basics": {
+            "name", "tagline", "description" (500+ words),
+            "founded", "headquarters", "employees", "funding"
+          },
+          "detailed_features": [
+            {"name", "description" (100+ words), "category", "importance"}
+          ],
+          "pricing": {
+            "model", "free_tier", "starter_price", "tiers": [
+              {"name", "price", "features" (20+), "limits", "best_for"}
+            ]
+          },
+          "use_cases": [
+            {"title", "description" (200+ words), "industry", "company_size"}
+          ],
+          "pros_cons": {
+            "pros": [{"title", "explanation" (50+ words)}],
+            "cons": [{"title", "explanation" (50+ words)}]
+          },
+          "integrations": [
+            {"name", "type", "description", "documentation_url"}
+          ],
+          "alternatives": [
+            {"name", "comparison" (100+ words), "when_to_choose"}
+          ],
+          "reviews": {
+            "average_rating", "total_reviews",
+            "rating_breakdown": {"5": %, "4": %, "3": %, "2": %, "1": %},
+            "expert_reviews": [{"source", "rating", "summary" (200+ words)}]
+          },
+          "technical_specs": {
+            "platforms", "languages", "api", "security", "compliance"
+          },
+          "support": {
+            "channels", "response_time", "documentation_quality", "community"
+          },
+          "media": {
+            "logo", "screenshots" (10+), "videos", "diagrams"
+          }
+        }
+        ```
+     
+     3. **Create comprehensive taxonomy archive pages**
+        
+        **For Category/Type taxonomy pages (e.g., /categories/crm-software/, /types/italian-restaurants/, /specialties/anxiety-therapy/):**
+        - Comprehensive overview of the category (1000+ words)
+        - Complete buyer's/selection guide
+        - Key features to look for
+        - Common use cases and who needs this
+        - Price range analysis and what affects cost
+        - Industry trends and future outlook
+        - Comparison methodology explanation
+        - Top 10-20 entries with detailed previews
+        - Quick comparison table
+        - 20-30 FAQs about this category
+        - Related categories and how they differ
+        - Expert opinions and industry insights
+        - Glossary of category-specific terms
+        - Statistics and market data
+        - ALL entries in this category listed below with rich cards
+        
+        **For Location pages (e.g., /locations/new-york/):**
+        - Complete local market analysis (1000+ words)
+        - Local regulations and requirements
+        - Average prices in this area vs national
+        - Transportation and parking information
+        - Neighborhood-by-neighborhood breakdown
+        - Local insurance providers accepted
+        - Emergency services in the area
+        - Community resources and support groups
+        - Local statistics and demographics
+        - ALL providers in this location with detailed cards
+        - Nearby locations for comparison
+        - Local events and workshops
+        
+        **For Combined taxonomy pages (e.g., /crm-software-for-startups/, /italian-restaurants-manhattan/, /anxiety-therapists-new-york/):**
+        - Everything from both individual taxonomies combined
+        - Specific local/niche context 
+        - Why this combination matters (e.g., "Why startups need different CRM")
+        - Unique considerations for this intersection
+        - Price analysis for this specific combination
+        - Top 10 detailed comparisons with scoring methodology
+        - Map visualization (if location-based)
+        - Availability/wait times analysis
+        - Quick filter and sort options
+        - ALL matching entries with rich information cards
+     
+     4. **Collect extensive imagery**
+        - Product screenshots (10+ per entry)
+        - Logo variations
+        - Feature demonstration images
+        - Comparison charts and infographics
+        - Industry-relevant stock photos from Unsplash
+        - Create custom diagrams where needed
+
+     ### Phase 2: Website Development (THIS IS NOT OPTIONAL - YOU MUST BUILD THE WEBSITE)
+     
+     **DO NOT STOP AFTER RESEARCH. BUILD THE ACTUAL WEBSITE NOW.**
+     
+     1. **Start with local WordPress Docker environment**
+        - Run `docker-compose up -d`
+        - Access at http://localhost
+     
+     2. **Build the custom theme with FULL SEO optimization**
+        - Create detailed, complex CSS (not simple/short)
+        - Modern, clean, modular design
+        - Implement all directory pages from JSON data
+        - Add comprehensive animations and interactions
+        - Ensure responsive design with multiple breakpoints
+     
+     3. **Generate ALL ranking pages with maximized SEO**
+        - Create "Best X in Y" pages for every location/category combination - THIS IS ESSENTIAL ON LOCATION PAGES
+        - Maximize meta titles (60 chars) for each page - use words like Best X in Y or something else to help rank for those keywords
+        - Maximize meta descriptions (160 chars) for each page
+        - Create unique, comprehensive H1 titles
+        - Write detailed, SEO-optimized descriptions for every page
+        - Build internal linking structure between related pages
+     
+     4. **Create 5-7 horizontal template variations**
+        - Grid layout with filters
+        - Card-based design with hover effects  
+        - List view with detailed information
+        - Comparison table layout
+        - Map-based directory view
+        - Featured/spotlight layout
+        - Masonry/Pinterest style layout
+     
+     5. **Build mega header navigation**
+        - Multi-level dropdown menus
+        - Search functionality
+        - Category quick links
+        - Location selector
+        - Sticky header on scroll
+        - Mobile-optimized hamburger menu
+     
+     6. **Implement review system (not basic comments)**
+        - Custom review form for each directory entry
+        - Frame as "Leave a Review" for product/service
+        - Star rating system
+        - Review categories (quality, service, value, etc.)
+        - Review moderation queue
+        - Display average ratings
+        - Sort reviews by helpful/recent/rating
+     
+     7. **Add contact form**
+        - Professional contact form with validation
+        - Multiple contact reasons dropdown
+        - File upload capability
+        - Anti-spam measures
+        - Email notification system
+     
+     8. **Import directory data from JSON**
+        - Create custom post types for directory entries
+        - Import JSON data into WordPress
+        - Set up taxonomy/category structure
+        - Generate all location/category pages automatically
+     
+     9. **Test thoroughly locally**
+        - Check all pages and permalinks
+        - Verify images load correctly
+        - Test responsive design
+        - Validate all SEO elements
+        - Test review submission
+        - Test contact form
+
+     ### Phase 2.5: MANDATORY Playwright Verification - CHECK EVERY SINGLE LINK
+     
+     **⛔ STOP! DO NOT SKIP THIS! YOU MUST CHECK EVERY SINGLE LINK WITH PLAYWRIGHT!**
+     
+     **THE WEBSITE IS NOT COMPLETE UNTIL PLAYWRIGHT VERIFIES ZERO 404s**
+     
+     Use the pre-configured Playwright MCP to verify EVERY link works. Do not just check "a few" links.
+     Do not just check "some" pages. CHECK THEM ALL. The header and footer ALWAYS have broken links
+     if you don't verify them properly!
+     
+     1. **MANDATORY: Extract and Test EVERY Header Link**
+        ```
+        Use playwright mcp to:
+        1. Navigate to http://localhost
+        2. Extract ALL href attributes from the header navigation
+        3. Create a list of EVERY SINGLE link found
+        4. Visit EACH link one by one
+        5. Verify EACH loads without 404
+        6. If ANY link returns 404, FIX IT IMMEDIATELY
+        
+        Example: If header has Home, About, Services, Blog, Contact, Categories dropdown with 
+        10 categories, Location dropdown with 20 locations - that's 35 links to check. 
+        CHECK ALL 35. Not 5. Not 10. ALL 35.
+        ```
+     
+     2. **MANDATORY: Extract and Test EVERY Footer Link**
+        ```
+        Use playwright mcp to:
+        1. Scroll to footer
+        2. Extract ALL href attributes from the footer
+        3. Visit EVERY SINGLE footer link
+        4. Do not assume they work - TEST THEM
+        5. Common broken footer links: Privacy Policy, Terms, Sitemap
+        6. CREATE these pages if they don't exist
+        ```
+     
+     3. **MANDATORY: Test EVERY Directory Entry**
+        ```
+        DO NOT test "a few examples" - test EVERY SINGLE ONE:
+        - Get the full list of all directory entries
+        - Visit each one: /companies/company-1/, /companies/company-2/, etc.
+        - If you have 50 entries, test all 50
+        - Each must load with proper content, not 404
+        ```
+     
+     4. **MANDATORY: Test EVERY Taxonomy Page**
+        ```
+        Test EVERY SINGLE taxonomy page that should exist:
+        - EVERY category: /categories/[slug]/ for each category
+        - EVERY location: /locations/[slug]/ for each location  
+        - EVERY tag: /tags/[slug]/ for each tag
+        - EVERY combination page if they exist
+        - Do not test "some" - test EVERY SINGLE ONE
+        ```
+     
+     5. **MANDATORY: Systematic Link Extraction and Testing**
+        ```
+        Use playwright mcp to run this systematic check:
+        
+        // Extract ALL links from the site
+        const allLinks = await page.evaluate(() => {
+          return Array.from(document.querySelectorAll('a[href]'))
+            .map(a => a.href)
+            .filter(href => href.startsWith('http://localhost'));
+        });
+        
+        // Test EVERY SINGLE link
+        for (const link of allLinks) {
+          await page.goto(link);
+          // Check for 404 or error
+          // Log any broken links
+        }
+        
+        If you find 10 links, test 10.
+        If you find 100 links, test 100.
+        If you find 500 links, test 500.
+        TEST THEM ALL.
+        ```
+     
+     6. **FIX ALL BROKEN LINKS IMMEDIATELY**
+        ```
+        For EVERY 404 found:
+        - Create the missing page
+        - Or fix the incorrect link
+        - Re-test with Playwright to confirm it's fixed
+        - Do not move on until ZERO 404s exist
+        ```
+     
+     7. **Fix Every Broken Link Found**
+        ```
+        Whatever links are in the header/footer:
+        - Test them ALL with Playwright
+        - If they return 404, either fix the link or create the page
+        - Common broken links: About, Contact, Privacy, Terms, Blog, etc.
+        - Do not assume any link works - TEST IT
+        ```
+     
+     8. **Final Verification Report**
+        ```
+        Only after testing EVERY link, generate report:
+        - Total links found in header: [number]
+        - Total links found in footer: [number]
+        - Total directory entries tested: [number]
+        - Total taxonomy pages tested: [number]
+        - Total unique URLs tested: [number]
+        - 404 errors found and fixed: [list]
+        - Final status: MUST be "Zero 404s found"
+        ```
+     
+     **❌ UNACCEPTABLE:**
+     - "I tested a few links and they work"
+     - "I checked some pages"
+     - "The main pages seem to work"
+     - "I verified the important links"
+     
+     **✅ REQUIRED:**
+     - "I tested all 47 header links - all working"
+     - "I tested all 23 footer links - all working"
+     - "I tested all 85 directory entries - all working"
+     - "I tested all 35 taxonomy pages - all working"
+     - "Total: 190 unique URLs tested, zero 404s"
+     
+     **THE WEBSITE IS NOT COMPLETE UNTIL EVERY SINGLE LINK WORKS**
+
+     ## ✅ ONLY NOW REPORT BACK TO THE USER
+     
+     **NOW that you have a COMPLETE, WORKING website with ZERO 404s, you can report:**
+     - "Website complete and verified at http://localhost"
+     - "All [X] directory entries created and tested"
+     - "All [X] taxonomy pages working"
+     - "Playwright verified [X] total links - ZERO 404 errors"
+     - "Ready for deployment with ./migrate_now.sh"
+     
+     **If you haven't done ALL of the above, GO BACK and finish the website.**
+
+     ### Phase 3: Deployment to Digital Ocean
+     1. **Setup infrastructure**
+        - Run `./setup_ssh_and_deploy.sh` (one-time SSH setup)
+        - Run `python3 create_droplet_with_ssh.py`
+        - Wait 5-10 minutes for installation
+     
+     2. **Migrate to production**
+        - Run `./migrate_now.sh`
+        - Verify custom theme transferred
+        - Check that permalinks work (auto-configured)
+     
+     3. **Final configuration**
+        - Point domain to droplet IP
+        - Install SSL certificate
+        - Configure backups
+
+     ---
+
+     ## 📚 Directory Website Development
+
+     ### SEO Page Structure Requirements
+
+     **IMPORTANT:** Do NOT use Rank Math during development. Focus on native SEO implementation.
+     Rank Math will only be added at launch for Search Console submission.
+
+     Every page must have:
+     - **Meta Title**: Maximized to 60 characters with keywords
+     - **Meta Description**: Maximized to 160 characters with compelling copy
+     - **H1 Title**: Unique and keyword-rich
+     - **Page Content**: Minimum 300-500 words of unique, valuable content
+     - **Schema Markup**: LocalBusiness, Product, or Review schema as appropriate
+     - **Open Graph tags**: For social sharing
+     - **Internal Links**: 3-5 contextual links to related pages
+
+     Generate these page types for maximum ranking potential:
+     - "Best [Product] in [City]" - for every city
+     - "Top 10 [Category] in [State]" - for every state
+     - "[Product] near me" - location-based pages
+     - "[Category] Reviews [Year]" - fresh content pages
+     - "Compare [Product A] vs [Product B]" - comparison pages
+     - "[Product] for [Use Case]" - intent-based pages
+     - "Cheap/Affordable [Product] in [Location]" - price-focused pages
+
+     ### Review System Framework
+
+     Frame reviews contextually based on the directory type:
+     - For restaurants: "[Cuisine] lovers who dined at [Restaurant] can leave a review"
+     - For products: "[Product] users who tried [Brand] can share their experience"
+     - For services: "Customers who used [Service] from [Company] can rate their experience"
+     - For venues: "Visitors who went to [Venue] can share their thoughts"
+
+     Review form should include:
+     - Overall star rating (1-5 stars)
+     - Category-specific ratings (e.g., Quality, Service, Value, Location)
+     - Written review with minimum 50 characters
+     - Photo upload option
+     - "Would you recommend?" Yes/No
+     - Verified purchase/visit checkbox
+     - Helpful/Not Helpful voting on other reviews
+
+     ### Research Phase with Jina AI
+
+     When building directory websites, use Jina AI for comprehensive research:
+
+     ```bash
+     # Search for information (use s.jina.ai)
+     curl "https://s.jina.ai/?q=YOUR_SEARCH_TERM" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+
+     # Scrape individual pages (use r.jina.ai)
+     curl "https://r.jina.ai/https://example.com/page" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     ```
+
+     **Important Research Guidelines:**
+     - Create detailed JSON for each directory page
+     - If a page 404s or doesn't scrape properly, retry the scrape
+     - DO NOT use Jina to scrape CSS from design sites
+
+     ### Finding Royalty-Free Images
+
+     ```bash
+     # Search for Unsplash images using Jina
+     curl "https://s.jina.ai/?q=YOUR_IMAGE_DESCRIPTION+unsplash" \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     
+     # Then scrape the found Unsplash pages for non-premium images
+     curl "https://r.jina.ai/https://unsplash.com/photos/..." \
+       -H "Authorization: Bearer $JINA_API_KEY"
+     ```
+
+     ### Directory Page JSON Format
+
+     Each directory entry should have comprehensive data:
+
+     ```json
+     {
+       "id": "unique-identifier",
+       "name": "Company/Service Name",
+       "category": "Technology Category",
+       "description": "Detailed description...",
+       "features": ["feature1", "feature2", "..."],
+       "pricing": {
+         "model": "subscription/one-time/freemium",
+         "tiers": [...]
+       },
+       "images": {
+         "logo": "url-from-unsplash",
+         "screenshots": ["url1", "url2"],
+         "hero": "hero-image-url"
+       },
+       "metadata": {
+         "founded": "year",
+         "headquarters": "location",
+         "employees": "range",
+         "funding": "amount"
+       },
+       "links": {
+         "website": "url",
+         "documentation": "url",
+         "pricing": "url"
+       },
+       "tags": ["tag1", "tag2"],
+       "lastUpdated": "timestamp"
+     }
+     ```
+
+     ### CSS Development Guidelines
+
+     **IMPORTANT:** Create extremely detailed and complex CSS files that are well-thought-out:
+
+     - Don't write short, simple CSS - make it comprehensive
+     - Include detailed animations and transitions
+     - Add hover states, focus states, and active states
+     - Create responsive breakpoints for all screen sizes
+     - Include print styles and accessibility features
+     - Use CSS custom properties for theming
+     - Add detailed comments explaining complex sections
+     - Implement sophisticated grid and flexbox layouts
+     - Include fallbacks for older browsers
+
+     Example of detailed CSS approach:
+     ```css
+     /* Component: Directory Card
+        Purpose: Display individual directory entries
+        States: default, hover, active, disabled, loading
+        Breakpoints: mobile-first approach with 5 breakpoints
+        Accessibility: WCAG 2.1 AA compliant */
+     
+     .directory-card {
+       /* Base styles with extensive properties */
+       /* Multiple transition effects */
+       /* Complex shadow systems */
+       /* Detailed spacing scales */
+     }
+     ```
+
+     ## 🚀 Quick Deploy Workflow
+
+     When a user clones this repository and wants to deploy WordPress to Digital Ocean,
+     execute these commands in order:
+
+     ```bash
+     # 1. Setup environment
+     cp .env.example .env
+     # User must edit .env and add DO_API_TOKEN and JINA_API_KEY
+
+     # 2. Install Python dependencies
+     pip3 install python-dotenv requests
+
+     # 3. Start local WordPress
+     docker-compose up -d
+
+     # 4. Setup SSH keys (one-time)
+     ./setup_ssh_and_deploy.sh
+
+     # 5. Create Digital Ocean droplet
+     python3 create_droplet_with_ssh.py
+
+     # 6. Wait for installation (5-10 minutes)
+     sleep 300
+
+     # 7. Migrate local WordPress to droplet
+     ./migrate_now.sh
+     ```
+
+     ## 📁 Project Structure
+
+     ```
+     wordpress-claude-code-wizard/
+     ├── .env                          # DO_API_TOKEN goes here
+     ├── docker-compose.yml            # Local WordPress environment
+     ├── Dockerfile                    # Custom Apache/PHP image
+     ├── wp-config.php                # Environment-aware configuration
+     ├── setup_ssh_and_deploy.sh      # SSH key automation
+     ├── create_droplet_with_ssh.py   # Droplet creation script
+     ├── migrate_now.sh               # Migration script
+     └── wp-content/
+         ├── themes/
+         │   └── my-custom-theme/     # Starter theme
+         └── plugins/
+             └── custom-post-types/    # CPT plugin
+     ```
+
+     ## 🎨 WordPress Development Guide
+
+     ### Theme Development
+
+     Users can modify the custom theme in `wp-content/themes/my-custom-theme/`:
+
+     ```bash
+     # Create new page template
+     cat > wp-content/themes/my-custom-theme/page-about.php << 'EOF'
+     <?php
+     /* Template Name: About Page */
+     get_header();
+     ?>
+     <main class="site-main">
+         <div class="container">
+             <h1><?php the_title(); ?></h1>
+             <?php the_content(); ?>
+         </div>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+
+     # Create custom single post template
+     cat > wp-content/themes/my-custom-theme/single.php << 'EOF'
+     <?php get_header(); ?>
+     <main class="site-main">
+         <article>
+             <h1><?php the_title(); ?></h1>
+             <div class="meta">Posted on <?php echo get_the_date(); ?></div>
+             <?php the_content(); ?>
+         </article>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+
+     # Create archive template
+     cat > wp-content/themes/my-custom-theme/archive.php << 'EOF'
+     <?php get_header(); ?>
+     <main class="site-main">
+         <h1><?php the_archive_title(); ?></h1>
+         <?php while (have_posts()) : the_post(); ?>
+             <article>
+                 <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+                 <?php the_excerpt(); ?>
+             </article>
+         <?php endwhile; ?>
+     </main>
+     <?php get_footer(); ?>
+     EOF
+     ```
+
+     ### Adding Navigation Menus
+
+     Add to `wp-content/themes/my-custom-theme/functions.php`:
+
+     ```php
+     // Register multiple menu locations
+     register_nav_menus(array(
+         'primary' => __('Primary Menu', 'my-custom-theme'),
+         'footer' => __('Footer Menu', 'my-custom-theme'),
+         'social' => __('Social Links Menu', 'my-custom-theme'),
+     ));
+
+     // Add menu support
+     add_theme_support('menus');
+     ```
+
+     Display menus in theme templates:
+
+     ```php
+     // In header.php
+     <?php wp_nav_menu(array('theme_location' => 'primary')); ?>
+
+     // In footer.php
+     <?php wp_nav_menu(array('theme_location' => 'footer')); ?>
+     ```
+
+     ### WP-CLI Commands (Inside Docker Container)
+
+     ```bash
+     # Access the WordPress container
+     docker exec -it wp-dev bash
+
+     # Install WP-CLI (if not already installed)
+     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+     chmod +x wp-cli.phar
+     mv wp-cli.phar /usr/local/bin/wp
+
+     # Create pages
+     wp post create --post_type=page --post_title='Home' --post_status=publish
+     wp post create --post_type=page --post_title='About Us' --post_status=publish
+     wp post create --post_type=page --post_title='Services' --post_status=publish
+     wp post create --post_type=page --post_title='Contact' --post_status=publish
+     wp post create --post_type=page --post_title='Blog' --post_status=publish
+
+     # Set static homepage
+     wp option update page_on_front 2  # Use page ID
+     wp option update show_on_front page
+     wp option update page_for_posts 5  # Blog page ID
+
+     # Create menu
+     wp menu create "Main Menu"
+     wp menu location assign main-menu primary
+     wp menu item add-post main-menu 2  # Add pages to menu
+     wp menu item add-post main-menu 3
+     wp menu item add-post main-menu 4
+
+     # Install popular plugins
+     wp plugin install contact-form-7 --activate
+     wp plugin install wordpress-seo --activate
+     wp plugin install elementor --activate
+     wp plugin install woocommerce --activate
+     wp plugin install updraftplus --activate
+
+     # Create users
+     wp user create john john@example.com --role=editor --user_pass=password123
+     wp user create jane jane@example.com --role=author --user_pass=password123
+
+     # Update site options
+     wp option update blogname "My Awesome Site"
+     wp option update blogdescription "A WordPress site built with Claude Code Wizard"
+     wp option update timezone_string "America/New_York"
+
+     # Set permalinks
+     wp rewrite structure '/%postname%/'
+     wp rewrite flush
+     ```
+
+     ### Custom Post Types
+
+     The included plugin already creates Portfolio and Testimonial post types. To add
+     more:
+
+     ```php
+     // Add to wp-content/plugins/custom-post-types/custom-post-types.php
+
+     public function register_team_post_type() {
+         $args = array(
+             'labels' => array(
+                 'name' => 'Team Members',
+                 'singular_name' => 'Team Member',
+             ),
+             'public' => true,
+             'has_archive' => true,
+             'supports' => array('title', 'editor', 'thumbnail'),
+             'menu_icon' => 'dashicons-groups',
+             'show_in_rest' => true,
+         );
+         register_post_type('team', $args);
+     }
+     // Add to __construct(): add_action('init', array($this,
+     'register_team_post_type'));
+     ```
+
+     ### Advanced Theme Features
+
+     ```php
+     // Add to functions.php
+
+     // Custom image sizes
+     add_theme_support('post-thumbnails');
+     add_image_size('hero', 1920, 600, true);
+     add_image_size('team-member', 400, 400, true);
+
+     // Widget areas
+     function my_widgets_init() {
+         register_sidebar(array(
+             'name' => 'Homepage Widgets',
+             'id' => 'homepage-widgets',
+             'before_widget' => '<div class="widget">',
+             'after_widget' => '</div>',
+         ));
+     }
+     add_action('widgets_init', 'my_widgets_init');
+
+     // Custom logo support
+     add_theme_support('custom-logo', array(
+         'height' => 100,
+         'width' => 400,
+         'flex-height' => true,
+         'flex-width' => true,
+     ));
+
+     // Gutenberg support
+     add_theme_support('align-wide');
+     add_theme_support('editor-styles');
+     add_theme_support('wp-block-styles');
+     ```
+
+     ## 🔧 Troubleshooting Commands
+
+     ```bash
+     # Check if Docker containers are running
+     docker ps | grep wp-
+
+     # View Docker logs
+     docker-compose logs wordpress
+
+     # Restart containers
+     docker-compose restart
+
+     # Access MySQL directly
+     docker exec -it wp-mysql mysql -u wordpress -pwordpress_password wordpress
+
+     # Check droplet status
+     cat .droplet_info | python3 -m json.tool
+
+     # SSH to droplet
+     ssh -i ~/.ssh/wordpress_deploy root@$(cat .droplet_info | python3 -c "import
+     json,sys; print(json.load(sys.stdin)['ip_address'])")
+
+     # View WordPress error logs on droplet
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP "tail -f /var/log/apache2/error.log"
+
+     # Check cloud-init status
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP "cloud-init status"
+
+     # Delete droplet (cleanup)
+     python3 -c "
+     import requests, json, os
+     api_token = os.getenv('DO_API_TOKEN')
+     with open('.droplet_info') as f:
+         droplet_id = json.load(f)['droplet_id']
+     headers = {'Authorization': f'Bearer {api_token}'}
+     response =
+     requests.delete(f'https://api.digitalocean.com/v2/droplets/{droplet_id}',
+     headers=headers)
+     print('Droplet deleted' if response.status_code == 204 else 'Failed')
+     "
+     ```
+
+     ### 🚨 Fixing 404 Errors on Pages
+
+     If you encounter 404 errors on pages after deployment, the scripts now handle this
+     automatically. However, if you still have issues:
+
+     ```bash
+     # SSH to droplet
+     ssh -i ~/.ssh/wordpress_deploy root@YOUR_IP
+
+     # Check if permalinks are set correctly
+     wp --allow-root rewrite structure
+     
+     # Manually set permalinks and flush
+     wp --allow-root rewrite structure '/%postname%/'
+     wp --allow-root rewrite flush
+
+     # Verify Apache configuration
+     cat /etc/apache2/sites-enabled/wordpress.conf
+     # Should show: AllowOverride All
+
+     # Check .htaccess exists and is correct
+     cat /var/www/html/.htaccess
+     
+     # Restart Apache
+     systemctl restart apache2
+     ```
+
+     **Note:** The deployment scripts now automatically:
+     - Install WP-CLI on the server
+     - Configure Apache with AllowOverride All
+     - Set permalinks to /%postname%/
+     - Create proper .htaccess file
+     - Flush rewrite rules after migration
+
+     ## 📊 Production Deployment Checklist
+
+     Before deploying to production:
+
+     1. ✅ Update passwords in wp-config.php
+     2. ✅ Set WP_DEBUG to false
+     3. ✅ Update salts (automatic during migration)
+     4. ✅ Install SSL certificate (certbot --apache)
+     5. ✅ Configure domain DNS
+     6. ✅ Enable firewall (ufw)
+     7. ✅ Set up backups
+     8. ✅ Configure email settings
+
+     ## 🎯 Complete Workflow Summary
+
+     1. **Clone repo** → Get complete WordPress development environment
+     2. **Docker up** → Local WordPress running instantly
+     3. **Develop** → Theme, plugins, content - everything
+     4. **Setup SSH** → One-time automated key configuration
+     5. **Create droplet** → Automated via API with WordPress installation
+     6. **Migrate** → Transfer everything to production
+     7. **Point domain** → Update DNS A record
+     8. **SSL** → Run certbot for HTTPS
+     9. **Live** → Production WordPress site running!
+
+     ## 💡 Key Features This Provides
+
+     - **Zero DevOps knowledge required** - Just need DO API token
+     - **Perfect environment parity** - Docker matches production exactly
+     - **Complete WordPress control** - Full admin access, all features
+     - **Real VPS** - Not shared hosting, full server control
+     - **One-command deployment** - Actually automated, not marketing speak
+     - **Cost effective** - $6/month for production site
+     - **No vendor lock-in** - Standard WordPress on standard Ubuntu
+     - **Version controlled** - Everything in Git
+     - **Instant local development** - Changes visible immediately
+     - **Professional workflow** - Local → Staging → Production capable
+
+     ## 🚨 Important Notes
+
+     - Always test locally before deploying
+     - Keep backups of production database
+     - Use strong passwords in production
+     - Update WordPress, themes, and plugins regularly
+     - Monitor server resources on Digital Ocean
+     - The migration script replaces the entire WordPress installation
+     - Custom plugins/themes in wp-content are preserved
+     - Database is completely replaced with local version
+
+     ## 🔄 Updating Production Site
+
+     To update your production site after local changes:
+
+     ```bash 
+     # Make changes locally
+     # Test everything at http://localhost
+
+     # Re-run migration to update production
+     ./migrate_now.sh
+
+     # Your production site is now updated with all local changes
+     ```
+
+     This is a complete local-to-production WordPress development and deployment
+     pipeline that doesn't exist anywhere else in this form!
+
+
+================================================
+FILE: .claude/wordpress_deployment_workflow.md
+================================================
+# WordPress to Digital Ocean Automated Deployment Workflow
+
+## Overview
+This is a complete CI/CD pipeline for deploying local WordPress development to Digital Ocean droplets automatically. When users clone this repo, Claude can execute this entire workflow without manual intervention.
+
+## Prerequisites Check
+1. Docker and Docker Compose installed
+2. Python 3 with pip
+3. Digital Ocean API token in `.env` file
+
+## Complete Automated Workflow
+
+### Phase 1: Local WordPress Setup
+```bash
+# 1. Start local WordPress development environment
+docker-compose up -d
+
+# 2. Verify containers are running
+docker ps | grep wp-
+```
+
+### Phase 2: SSH Key Setup (One-time)
+```bash
+# 1. Run SSH setup script
+./setup_ssh_and_deploy.sh
+
+# This script will:
+# - Generate SSH keypair at ~/.ssh/wordpress_deploy
+# - Upload public key to Digital Ocean via API
+# - Save SSH key ID to .ssh_key_id file
+```
+
+### Phase 3: Create Digital Ocean Droplet
+```bash
+# 1. Run droplet creation with SSH access
+python3 create_droplet_with_ssh.py
+
+# This will:
+# - Create Ubuntu 22.04 droplet
+# - Install WordPress via cloud-init
+# - Configure MySQL with generated passwords
+# - Enable SSH access with your key
+# - Save credentials to .droplet_info
+```
+
+### Phase 4: Wait for WordPress Installation
+```bash
+# Check cloud-init status (takes 5-10 minutes)
+ssh -i ~/.ssh/wordpress_deploy root@$(cat .droplet_info | python3 -c "import json,sys; print(json.load(sys.stdin)['ip_address'])") "cloud-init status --wait"
+```
+
+### Phase 5: Migrate Local WordPress to Droplet
+```bash
+# Run migration script
+./migrate_to_droplet.sh
+
+# This will:
+# - Export local WordPress database
+# - Package wp-content directory
+# - Transfer to droplet via SCP
+# - Import database
+# - Update wp-config.php
+# - Set proper permissions
+```
+
+## File Structure Required
+```
+wordpress-deployment/
+├── .env                          # DO_API_TOKEN=your_token_here
+├── docker-compose.yml            # Local WordPress stack
+├── Dockerfile                    # Custom WordPress image
+├── wp-config.php                # Environment-aware config
+├── .htaccess                    # Apache rules
+├── wp-content/                  # Themes and plugins
+│   ├── themes/
+│   │   └── my-custom-theme/
+│   └── plugins/
+│       └── custom-post-types/
+├── create_droplet_with_ssh.py   # Creates DO droplet with SSH
+├── setup_ssh_and_deploy.sh      # SSH key setup
+├── migrate_to_droplet.sh        # Migration script
+└── .claude/                     # Claude's memory
+    └── wordpress_deployment_workflow.md
+
+```
+
+## Environment Variables (.env)
+```bash
+DO_API_TOKEN=your_digital_ocean_api_token
+DROPLET_REGION=nyc3              # Optional
+DROPLET_SIZE=s-1vcpu-1gb        # Optional
+MYSQL_ROOT_PASSWORD=             # Optional, auto-generated if empty
+WP_DB_PASSWORD=                  # Optional, auto-generated if empty
+```
+
+## Key Scripts Explanation
+
+### setup_ssh_and_deploy.sh
+- Generates ED25519 SSH keypair
+- Uploads to DO via API
+- Stores key ID for droplet creation
+
+### create_droplet_with_ssh.py
+- Creates Ubuntu 22.04 droplet
+- Includes SSH key for passwordless access
+- Runs cloud-init script to install LAMP + WordPress
+- Outputs JSON to .droplet_info
+
+### migrate_to_droplet.sh
+- Reads .droplet_info for connection details
+- Uses SSH key for authentication
+- Exports local database
+- Transfers wp-content
+- Updates configuration for production
+
+## Automated Execution Commands
+
+For a fresh clone from GitHub, execute in order:
+
+```bash
+# 1. Install Python dependencies
+pip3 install python-dotenv requests
+
+# 2. Copy and configure environment
+cp .env.example .env
+# Edit .env and add DO_API_TOKEN
+
+# 3. Start local WordPress
+docker-compose up -d
+
+# 4. Setup SSH (one-time)
+./setup_ssh_and_deploy.sh
+
+# 5. Create and deploy
+python3 create_droplet_with_ssh.py
+
+# 6. Wait for installation (5-10 minutes)
+sleep 300
+
+# 7. Migrate WordPress
+./migrate_to_droplet.sh
+```
+
+## Troubleshooting Commands
+
+```bash
+# Check droplet info
+cat .droplet_info | python3 -m json.tool
+
+# Check SSH access
+ssh -i ~/.ssh/wordpress_deploy root@$(cat .droplet_info | python3 -c "import json,sys; print(json.load(sys.stdin)['ip_address'])") "echo 'SSH OK'"
+
+# Check WordPress installation
+curl -I http://$(cat .droplet_info | python3 -c "import json,sys; print(json.load(sys.stdin)['ip_address'])")
+
+# View cloud-init logs
+ssh -i ~/.ssh/wordpress_deploy root@$(cat .droplet_info | python3 -c "import json,sys; print(json.load(sys.stdin)['ip_address'])") "tail -50 /var/log/cloud-init-output.log"
+
+# Delete droplet (cleanup)
+python3 -c "
+import requests, json, os
+api_token = os.getenv('DO_API_TOKEN')
+with open('.droplet_info') as f:
+    droplet_id = json.load(f)['droplet_id']
+headers = {'Authorization': f'Bearer {api_token}'}
+requests.delete(f'https://api.digitalocean.com/v2/droplets/{droplet_id}', headers=headers)
+"
+```
+
+## Success Indicators
+1. Local WordPress accessible at http://localhost
+2. SSH key registered with DO (check .ssh_key_id exists)
+3. Droplet created (check .droplet_info exists)
+4. WordPress accessible at http://DROPLET_IP
+5. Migration completes without errors
+
+## Time Estimates
+- SSH setup: 10 seconds
+- Droplet creation: 1-2 minutes
+- WordPress installation: 5-10 minutes (due to apt upgrade)
+- Migration: 1-2 minutes
+- **Total: ~10-15 minutes**
+
+## Notes for Claude
+- Always check for .env file with DO_API_TOKEN
+- Ensure Docker is running before migration
+- Wait for cloud-init to complete before migrating
+- Use SSH key authentication (-i ~/.ssh/wordpress_deploy)
+- Read .droplet_info for connection details
+- The workflow is idempotent - can be re-run safely
+
