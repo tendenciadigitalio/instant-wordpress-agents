@@ -1,0 +1,22 @@
+# Menus specification
+menus:
+  - location: "primary"
+    description: "Main navigation"
+    items:
+      - label: "Home"
+        url: "/"
+      - label: "Blog"
+        url: "/blog/"
+      - label: "Case Studies"
+        url: "/case-studies/"
+      - label: "About"
+        url: "/about/"
+      - label: "Contact"
+        url: "/contact/"
+  - location: "footer"
+    description: "Footer navigation"
+    items:
+      - label: "Privacy Policy"
+        url: "/privacy-policy/"
+      - label: "Terms"
+        url: "/terms/"

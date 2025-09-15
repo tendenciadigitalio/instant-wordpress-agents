@@ -1,0 +1,17 @@
+# Taxonomies specification
+taxonomies:
+  - name: "industry"
+    singular: "Industry"
+    plural: "Industries"
+    hierarchical: true
+    slug: "industry"
+    associated_cpts:
+      - "case_study"
+  - name: "feature"
+    singular: "Feature"
+    plural: "Features"
+    hierarchical: false
+    slug: "feature"
+    associated_cpts:
+      - "post"
+      - "case_study"

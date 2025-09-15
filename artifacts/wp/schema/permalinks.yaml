@@ -1,0 +1,4 @@
+# Permalinks specification
+permalinks:
+  structure: "/%postname%/"
+  flush_on_build: true

@@ -1,0 +1,13 @@
+# Content Types (CPTs) specification
+cpts:
+  - name: "case_study"
+    singular: "Case Study"
+    plural: "Case Studies"
+    supports:
+      - title
+      - editor
+      - thumbnail
+      - excerpt
+    has_archive: true
+    slug: "case-studies"
+    menu_icon: "dashicons-portfolio"
